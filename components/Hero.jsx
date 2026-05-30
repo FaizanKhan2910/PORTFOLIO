@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 const ThreeSphere = dynamic(() => import('./ThreeSphere'), { ssr: false })
 
@@ -46,6 +47,7 @@ export default function Hero() {
   const [roleIndex, setRoleIndex] = useState(0)
   const [displayed, setDisplayed] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     const target = ROLES[roleIndex]
@@ -68,171 +70,287 @@ export default function Hero() {
   return (
     <section style={{
       height: '100vh', position: 'relative',
-      display: 'flex', alignItems: 'center',
+      display: 'flex', 
+      alignItems: 'center',
+      justifyContent: isMobile ? 'center' : 'flex-start',
       overflow: 'hidden',
     }}>
-      {/* Social sidebar */}
-      <div style={{
-        position: 'absolute', left: '32px', top: '50%',
-        transform: 'translateY(-50%)',
-        display: 'flex', flexDirection: 'column',
-        gap: '24px', zIndex: 10,
-      }}>
-        {SOCIALS.map(s => (
-          <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
-            title={s.label}
+      
+      {isMobile ? (
+        // MOBILE LAYOUT
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          width: '100%', padding: '0 24px', zIndex: 10,
+          marginTop: '60px'
+        }}>
+          {/* Status Pill */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            padding: '6px 12px', border: '1px solid #3fb95022',
+            borderRadius: '20px', marginBottom: '32px'
+          }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3fb950', boxShadow: '0 0 8px #3fb950' }} />
+            <span style={{ fontFamily: 'var(--font-space)', fontSize: '11px', color: '#3fb950' }}>Available for internships</span>
+          </div>
+
+          {/* Name */}
+          <h1 style={{
+            fontFamily: 'var(--font-space)',
+            fontSize: 'clamp(48px, 12vw, 72px)',
+            fontWeight: 700,
+            lineHeight: 0.95,
+            letterSpacing: '-2px',
+            color: '#F0ECE3',
+            textAlign: 'center',
+            marginBottom: '16px'
+          }}>
+            FAIZAN<br />
+            <span style={{
+              background: 'linear-gradient(135deg, #C9A96E, #F0ECE3)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              KHAN
+            </span>
+          </h1>
+
+          {/* Center: Three.js */}
+          <div style={{
+            width: '260px', height: '260px',
+            position: 'relative', margin: '0 auto',
+            marginBottom: '24px'
+          }}>
+            <ThreeSphere />
+          </div>
+
+          {/* Roles */}
+          <div style={{
+            fontFamily: 'var(--font-space)',
+            fontSize: 'clamp(18px, 5vw, 28px)',
+            fontWeight: 700,
+            letterSpacing: '-0.5px',
+            color: '#F0ECE3',
+            textAlign: 'center',
+            minHeight: '2em',
+            marginBottom: '32px'
+          }}>
+            <span style={{
+              background: 'linear-gradient(135deg, #D4847A, #C9A96E)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              {displayed}
+            </span>
+            <span style={{
+              display: 'inline-block', width: '2px', height: '0.9em',
+              background: '#C9A96E', verticalAlign: 'middle',
+              marginLeft: '4px', animation: 'blink 0.7s step-end infinite',
+            }} />
+          </div>
+
+          {/* Socials Row */}
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '40px' }}>
+            {SOCIALS.map(s => (
+              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                style={{
+                  width: '42px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  border: '1px solid #C9A96E44', borderRadius: '50%',
+                  color: '#C5C1BD', textDecoration: 'none'
+                }}
+              >
+                {s.icon}
+              </a>
+            ))}
+          </div>
+
+          {/* Full width resume button */}
+          <a
+            href="/resume.pdf" target="_blank" rel="noopener noreferrer"
             style={{
-              width: '42px', height: '42px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: '1px solid #C9A96E44',
-              borderRadius: '50%',
-              fontFamily: 'var(--font-space)',
-              color: '#C5C1BD', // Brighter default color
-              textDecoration: 'none',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = '#C9A96E'
-              e.currentTarget.style.color = '#C9A96E'
-              e.currentTarget.style.background = '#C9A96E11'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = '#C9A96E22'
-              e.currentTarget.style.color = '#7A7572'
-              e.currentTarget.style.background = 'transparent'
+              width: '100%', padding: '16px 0',
+              border: '1px solid #C9A96E',
+              color: '#C9A96E',
+              fontFamily: 'var(--font-space)', fontSize: '13px',
+              letterSpacing: '2px', textDecoration: 'none',
+              textAlign: 'center', textTransform: 'uppercase'
             }}
           >
-            {s.icon}
+            RESUME ↗
           </a>
-        ))}
-        <div style={{ width: '1px', height: '60px', background: 'linear-gradient(to bottom, #C9A96E33, transparent)', margin: '0 auto' }} />
-      </div>
 
-      {/* Left: Name */}
-      <div style={{
-        position: 'absolute', left: '100px', top: '50%',
-        transform: 'translateY(-50%)',
-        zIndex: 10,
-      }}>
-        <p style={{
-          fontFamily: 'var(--font-space)',
-          fontSize: '13px',
-          color: '#7A7572',
-          letterSpacing: '2px',
-          marginBottom: '12px',
-        }}>
-          Hello! I&apos;m
-        </p>
-        <h1 style={{
-          fontFamily: 'var(--font-space)',
-          fontSize: 'clamp(52px, 7vw, 92px)',
-          fontWeight: 700,
-          lineHeight: 0.95,
-          letterSpacing: '-3px',
-          color: '#F0ECE3',
-        }}>
-          FAIZAN<br />
-          <span style={{
-            background: 'linear-gradient(135deg, #C9A96E, #F0ECE3)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>
-            KHAN
-          </span>
-        </h1>
-      </div>
-
-      {/* Center: Three.js */}
-      <div style={{
-        position: 'absolute',
-        left: '50%', top: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 'clamp(300px, 40vw, 560px)',
-        height: 'clamp(300px, 40vw, 560px)',
-      }}>
-        <ThreeSphere />
-      </div>
-
-      {/* Right: Role */}
-      <div style={{
-        position: 'absolute', right: '80px', top: '50%',
-        transform: 'translateY(-50%)',
-        textAlign: 'right',
-        zIndex: 10, maxWidth: '380px',
-      }}>
-        <p style={{
-          fontFamily: 'var(--font-space)',
-          fontSize: '13px',
-          color: '#7A7572',
-          letterSpacing: '2px',
-          marginBottom: '12px',
-        }}>
-          An
-        </p>
-        <div style={{
-          fontFamily: 'var(--font-space)',
-          fontSize: 'clamp(24px, 3.5vw, 46px)',
-          fontWeight: 700,
-          letterSpacing: '-1px',
-          color: '#F0ECE3',
-          lineHeight: 1.1,
-          minHeight: '3em',
-        }}>
-          <span style={{
-            background: 'linear-gradient(135deg, #D4847A, #C9A96E)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>
-            {displayed}
-          </span>
-          <span style={{
-            display: 'inline-block', width: '2px', height: '0.9em',
-            background: '#C9A96E',
-            verticalAlign: 'middle',
-            marginLeft: '4px',
-            animation: 'blink 0.7s step-end infinite',
-          }} />
+          <div style={{ marginTop: '32px', fontFamily: 'var(--font-space)', fontSize: '11px', color: '#7A7572', letterSpacing: '1px' }}>
+            Scroll to explore ↓
+          </div>
         </div>
+      ) : (
+        // DESKTOP LAYOUT
+        <>
+          {/* Social sidebar */}
+          <div style={{
+            position: 'absolute', left: '32px', top: '50%',
+            transform: 'translateY(-50%)',
+            display: 'flex', flexDirection: 'column',
+            gap: '24px', zIndex: 10,
+          }}>
+            {SOCIALS.map(s => (
+              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                title={s.label}
+                style={{
+                  width: '42px', height: '42px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  border: '1px solid #C9A96E44',
+                  borderRadius: '50%',
+                  fontFamily: 'var(--font-space)',
+                  color: '#C5C1BD', 
+                  textDecoration: 'none',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = '#C9A96E'
+                  e.currentTarget.style.color = '#C9A96E'
+                  e.currentTarget.style.background = '#C9A96E11'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = '#C9A96E22'
+                  e.currentTarget.style.color = '#7A7572'
+                  e.currentTarget.style.background = 'transparent'
+                }}
+              >
+                {s.icon}
+              </a>
+            ))}
+            <div style={{ width: '1px', height: '60px', background: 'linear-gradient(to bottom, #C9A96E33, transparent)', margin: '0 auto' }} />
+          </div>
 
-        <style>{`@keyframes blink { 50% { opacity: 0; } }`}</style>
-      </div>
+          {/* Left: Name */}
+          <div style={{
+            position: 'absolute', left: '100px', top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: 10,
+          }}>
+            <p style={{
+              fontFamily: 'var(--font-space)',
+              fontSize: '13px',
+              color: '#7A7572',
+              letterSpacing: '2px',
+              marginBottom: '12px',
+            }}>
+              Hello! I&apos;m
+            </p>
+            <h1 style={{
+              fontFamily: 'var(--font-space)',
+              fontSize: 'clamp(52px, 7vw, 92px)',
+              fontWeight: 700,
+              lineHeight: 0.95,
+              letterSpacing: '-3px',
+              color: '#F0ECE3',
+            }}>
+              FAIZAN<br />
+              <span style={{
+                background: 'linear-gradient(135deg, #C9A96E, #F0ECE3)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                KHAN
+              </span>
+            </h1>
+          </div>
 
-      {/* Resume button */}
-      <a
-        href="/resume.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          position: 'absolute', bottom: '40px', right: '80px',
-          fontFamily: 'var(--font-space)',
-          fontSize: '11px',
-          letterSpacing: '2px',
-          color: '#7A7572',
-          textDecoration: 'none',
-          display: 'flex', alignItems: 'center', gap: '8px',
-          transition: 'color 0.3s',
-          zIndex: 10,
-        }}
-        onMouseEnter={e => e.currentTarget.style.color = '#C9A96E'}
-        onMouseLeave={e => e.currentTarget.style.color = '#7A7572'}
-      >
-        RESUME ↗
-      </a>
+          {/* Center: Three.js */}
+          <div style={{
+            position: 'absolute',
+            left: '50%', top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 'clamp(300px, 40vw, 560px)',
+            height: 'clamp(300px, 40vw, 560px)',
+          }}>
+            <ThreeSphere />
+          </div>
 
-      {/* Scroll indicator */}
-      <div style={{
-        position: 'absolute', bottom: '40px', left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', gap: '8px', zIndex: 10,
-      }}>
-        <div style={{
-          width: '1px', height: '60px',
-          background: 'linear-gradient(to bottom, transparent, #C9A96E66)',
-          animation: 'scrollPulse 2s ease infinite',
-        }} />
-        <style>{`@keyframes scrollPulse { 0%,100%{opacity:0.3}50%{opacity:1} }`}</style>
-      </div>
+          {/* Right: Role */}
+          <div style={{
+            position: 'absolute', right: '80px', top: '50%',
+            transform: 'translateY(-50%)',
+            textAlign: 'right',
+            zIndex: 10, maxWidth: '380px',
+          }}>
+            <p style={{
+              fontFamily: 'var(--font-space)',
+              fontSize: '13px',
+              color: '#7A7572',
+              letterSpacing: '2px',
+              marginBottom: '12px',
+            }}>
+              An
+            </p>
+            <div style={{
+              fontFamily: 'var(--font-space)',
+              fontSize: 'clamp(24px, 3.5vw, 46px)',
+              fontWeight: 700,
+              letterSpacing: '-1px',
+              color: '#F0ECE3',
+              lineHeight: 1.1,
+              minHeight: '3em',
+            }}>
+              <span style={{
+                background: 'linear-gradient(135deg, #D4847A, #C9A96E)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                {displayed}
+              </span>
+              <span style={{
+                display: 'inline-block', width: '2px', height: '0.9em',
+                background: '#C9A96E',
+                verticalAlign: 'middle',
+                marginLeft: '4px',
+                animation: 'blink 0.7s step-end infinite',
+              }} />
+            </div>
+          </div>
+
+          {/* Resume button */}
+          <a
+            href="/resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              position: 'absolute', bottom: '40px', right: '80px',
+              fontFamily: 'var(--font-space)',
+              fontSize: '11px',
+              letterSpacing: '2px',
+              color: '#7A7572',
+              textDecoration: 'none',
+              display: 'flex', alignItems: 'center', gap: '8px',
+              transition: 'color 0.3s',
+              zIndex: 10,
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = '#C9A96E'}
+            onMouseLeave={e => e.currentTarget.style.color = '#7A7572'}
+          >
+            RESUME ↗
+          </a>
+
+          {/* Scroll indicator */}
+          <div style={{
+            position: 'absolute', bottom: '40px', left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', gap: '8px', zIndex: 10,
+          }}>
+            <div style={{
+              width: '1px', height: '60px',
+              background: 'linear-gradient(to bottom, transparent, #C9A96E66)',
+              animation: 'scrollPulse 2s ease infinite',
+            }} />
+          </div>
+        </>
+      )}
+      
+      <style>{`
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes scrollPulse { 0%,100%{opacity:0.3}50%{opacity:1} }
+      `}</style>
 
       {/* Subtle grid */}
       <div style={{

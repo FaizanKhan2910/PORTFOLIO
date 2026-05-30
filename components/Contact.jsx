@@ -1,17 +1,21 @@
 'use client'
 
+import { useIsMobile } from '../hooks/useIsMobile'
+
 export default function Contact() {
+  const isMobile = useIsMobile()
+
   return (
-    <section id="contact" style={{ padding: '140px 100px', background: '#0A0A0C', overflow: 'hidden' }}>
+    <section id="contact" style={{ padding: isMobile ? '80px 24px' : '140px 100px', background: '#0A0A0C', overflow: 'hidden' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
-        <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '80px' }}>
+        <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: isMobile ? '40px' : '80px' }}>
           <span style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '3px', color: '#7A7572' }}>05</span>
           <div style={{ height: '1px', width: '60px', background: '#C9A96E33' }} />
           <span style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '3px', color: '#C9A96E' }}>Let&apos;s Build</span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '40px' : '80px', alignItems: 'center' }}>
           <div className="reveal">
             <h2 style={{
               fontFamily: 'var(--font-space)',
@@ -36,7 +40,7 @@ export default function Contact() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {[
                 { label: 'Email', value: 'fk6307672466@email.com', href: 'mailto:fk6307672466@email.com' },
-                { label: 'LinkedIn', value: 'faizan-khan-57092832a', href: 'https://linkedin.com/in/faizan-khan-57092832a' },
+                { label: 'LinkedIn', value: 'faizan-khan', href: 'https://linkedin.com/in/faizan-khan-57092832a' },
                 { label: 'GitHub', value: 'FaizanKhan2910', href: 'https://github.com/FaizanKhan2910' },
               ].map(link => (
                 <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer"
@@ -53,7 +57,7 @@ export default function Contact() {
                   <span style={{ fontFamily: 'var(--font-space)', fontSize: '10px', letterSpacing: '2px', color: '#7A7572', width: '70px', textTransform: 'uppercase' }}>
                     {link.label}
                   </span>
-                  <span style={{ fontFamily: 'var(--font-space)', fontSize: '14px', color: '#F0ECE3', flex: 1 }}>
+                  <span style={{ fontFamily: 'var(--font-space)', fontSize: '14px', color: '#F0ECE3', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {link.value}
                   </span>
                   <span style={{ color: '#C9A96E', fontSize: '14px' }}>↗</span>
@@ -68,24 +72,28 @@ export default function Contact() {
               href="mailto:fk6307672466@email.com"
               className="magnetic"
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: '16px',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '16px',
                 padding: '20px 40px',
-                border: '1px solid #C9A96E33',
+                width: isMobile ? '100%' : 'auto',
+                border: '1px solid #C9A96E',
+                background: isMobile ? '#C9A96E' : 'transparent',
                 fontFamily: 'var(--font-space)',
                 fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase',
-                color: '#C9A96E', textDecoration: 'none',
+                color: isMobile ? '#0C0C0E' : '#C9A96E', textDecoration: 'none',
                 borderRadius: '2px',
                 transition: 'all 0.4s ease',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.background = '#C9A96E'
-                e.currentTarget.style.color = '#0C0C0E'
-                e.currentTarget.style.borderColor = '#C9A96E'
+                if (!isMobile) {
+                  e.currentTarget.style.background = '#C9A96E'
+                  e.currentTarget.style.color = '#0C0C0E'
+                }
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.background = 'transparent'
-                e.currentTarget.style.color = '#C9A96E'
-                e.currentTarget.style.borderColor = '#C9A96E33'
+                if (!isMobile) {
+                  e.currentTarget.style.background = 'transparent'
+                  e.currentTarget.style.color = '#C9A96E'
+                }
               }}
             >
               Send a message <span style={{ fontSize: '18px' }}>→</span>

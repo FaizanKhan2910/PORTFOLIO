@@ -30,19 +30,23 @@ const WINS = [
   },
 ]
 
+import { useIsMobile } from '../hooks/useIsMobile'
+
 export default function Achievements() {
+  const isMobile = useIsMobile()
+
   return (
-    <section id="achievements" style={{ padding: '140px 100px', background: '#0A0A0C', overflow: 'hidden' }}>
+    <section id="achievements" style={{ padding: isMobile ? '80px 24px' : '140px 100px', background: '#0A0A0C', overflow: 'hidden' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
-        <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '80px' }}>
+        <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: isMobile ? '40px' : '80px' }}>
           <span style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '3px', color: '#7A7572' }}>03</span>
           <div style={{ height: '1px', width: '60px', background: '#C9A96E33' }} />
           <span style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '3px', color: '#C9A96E' }}>Hackathon Record</span>
         </div>
 
         {/* Big callout */}
-        <div className="reveal" style={{ marginBottom: '100px', textAlign: 'center' }}>
+        <div className="reveal" style={{ marginBottom: isMobile ? '60px' : '100px', textAlign: 'center' }}>
           <div style={{
             fontFamily: 'var(--font-space)',
             fontSize: 'clamp(48px, 8vw, 120px)',
@@ -59,31 +63,39 @@ export default function Achievements() {
 
         {/* Timeline */}
         <div style={{ position: 'relative' }}>
-          <div style={{
-            position: 'absolute', left: '0', top: '0', bottom: '0',
-            width: '1px', background: 'linear-gradient(to bottom, transparent, #C9A96E33, transparent)',
-          }} />
+          {!isMobile && (
+            <div style={{
+              position: 'absolute', left: '0', top: '0', bottom: '0',
+              width: '1px', background: 'linear-gradient(to bottom, transparent, #C9A96E33, transparent)',
+            }} />
+          )}
 
           {WINS.map((w, i) => (
             <div key={i} className="reveal" style={{
               display: 'grid',
-              gridTemplateColumns: '200px 1fr',
-              gap: '60px',
-              paddingLeft: '40px',
-              paddingBottom: i < WINS.length - 1 ? '80px' : '0',
+              gridTemplateColumns: isMobile ? '1fr' : '200px 1fr',
+              gap: isMobile ? '16px' : '60px',
+              paddingLeft: isMobile ? '0' : '40px',
+              paddingBottom: i < WINS.length - 1 ? (isMobile ? '48px' : '80px') : '0',
               position: 'relative',
             }}>
               {/* Timeline dot */}
-              <div style={{
-                position: 'absolute', left: '-5px', top: '8px',
-                width: '11px', height: '11px',
-                border: '2px solid #C9A96E',
-                borderRadius: '50%',
-                background: '#0A0A0C',
-              }} />
+              {!isMobile && (
+                <div style={{
+                  position: 'absolute', left: '-5px', top: '8px',
+                  width: '11px', height: '11px',
+                  border: '2px solid #C9A96E',
+                  borderRadius: '50%',
+                  background: '#0A0A0C',
+                }} />
+              )}
 
               {/* Left meta */}
-              <div>
+              <div style={{ 
+                display: isMobile ? 'flex' : 'block', 
+                alignItems: isMobile ? 'baseline' : 'stretch',
+                gap: isMobile ? '16px' : '0' 
+              }}>
                 <div style={{
                   fontFamily: 'var(--font-space)',
                   fontSize: 'clamp(40px, 5vw, 64px)',
@@ -91,20 +103,22 @@ export default function Achievements() {
                   background: 'linear-gradient(135deg, #C9A96E, #F0ECE3)',
                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                   lineHeight: 1,
-                  marginBottom: '8px',
+                  marginBottom: isMobile ? '0' : '8px',
                 }}>
                   {w.place}
                 </div>
-                <div style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '2px', color: '#7A7572' }}>
-                  {w.date}
-                </div>
-                <div style={{ fontFamily: 'var(--font-space)', fontSize: '11px', color: '#C9A96E44', marginTop: '4px' }}>
-                  {w.teams}
+                <div style={{ display: isMobile ? 'flex' : 'block', gap: '8px' }}>
+                  <div style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '2px', color: '#7A7572' }}>
+                    {w.date}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-space)', fontSize: '11px', color: '#C9A96E44', marginTop: isMobile ? '0' : '4px' }}>
+                    {w.teams}
+                  </div>
                 </div>
               </div>
 
               {/* Right content */}
-              <div style={{ paddingTop: '8px' }}>
+              <div style={{ paddingTop: isMobile ? '0' : '8px' }}>
                 <div style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '2px', color: '#7A7572', marginBottom: '8px', textTransform: 'uppercase' }}>
                   {w.level}
                 </div>

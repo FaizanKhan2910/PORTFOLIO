@@ -3,8 +3,9 @@ import { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { MeshDistortMaterial, Sphere, Environment } from '@react-three/drei'
 import * as THREE from 'three'
+import { useIsMobile } from '../hooks/useIsMobile'
 
-function AnimatedSphere() {
+function AnimatedSphere({ isMobile }) {
   const meshRef = useRef()
   const matRef = useRef()
 
@@ -16,21 +17,26 @@ function AnimatedSphere() {
     if (matRef.current) {
       matRef.current.distort = 0.3 + Math.sin(t * 0.5) * 0.15
     }
-    // Mouse parallax
-    meshRef.current.position.x = THREE.MathUtils.lerp(
-      meshRef.current.position.x,
-      state.mouse.x * 0.4,
-      0.05
-    )
-    meshRef.current.position.y = THREE.MathUtils.lerp(
-      meshRef.current.position.y,
-      state.mouse.y * 0.3,
-      0.05
-    )
+    // Mouse parallax only on desktop
+    if (!isMobile) {
+      meshRef.current.position.x = THREE.MathUtils.lerp(
+        meshRef.current.position.x,
+        state.mouse.x * 0.4,
+        0.05
+      )
+      meshRef.current.position.y = THREE.MathUtils.lerp(
+        meshRef.current.position.y,
+        state.mouse.y * 0.3,
+        0.05
+      )
+    }
   })
 
+  // Reduce segments on mobile
+  const args = isMobile ? [1.4, 64, 64] : [1.6, 128, 128]
+
   return (
-    <Sphere ref={meshRef} args={[1.6, 128, 128]}>
+    <Sphere ref={meshRef} args={args}>
       <MeshDistortMaterial
         ref={matRef}
         color="#8B5E3C"
@@ -46,8 +52,8 @@ function AnimatedSphere() {
   )
 }
 
-function Particles() {
-  const count = 120
+function Particles({ isMobile }) {
+  const count = isMobile ? 40 : 120
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3)
     for (let i = 0; i < count; i++) {
@@ -59,7 +65,7 @@ function Particles() {
       pos[i * 3 + 2] = r * Math.cos(phi)
     }
     return pos
-  }, [])
+  }, [count])
 
   const pointsRef = useRef()
   useFrame(({ clock }) => {
@@ -91,18 +97,21 @@ function Particles() {
 }
 
 export default function ThreeSphere() {
+  const isMobile = useIsMobile()
+  
   return (
     <Canvas
       style={{ width: '100%', height: '100%' }}
       camera={{ position: [0, 0, 4.5], fov: 50 }}
       gl={{ antialias: true, alpha: true }}
+      frameloop={isMobile ? "demand" : "always"}
     >
       <ambientLight intensity={0.3} />
       <directionalLight position={[5, 5, 5]} intensity={1.2} color="#C9A96E" />
       <directionalLight position={[-5, -3, -5]} intensity={0.4} color="#D4847A" />
       <pointLight position={[0, 3, 2]} intensity={0.8} color="#F0ECE3" />
-      <AnimatedSphere />
-      <Particles />
+      <AnimatedSphere isMobile={isMobile} />
+      <Particles isMobile={isMobile} />
       <Environment preset="city" />
     </Canvas>
   )

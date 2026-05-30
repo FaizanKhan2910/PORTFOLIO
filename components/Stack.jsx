@@ -33,17 +33,21 @@ const STACK = [
   },
 ]
 
-export default function Stack() {
-  return (
-    <section id="stack" style={{ padding: '140px 100px', maxWidth: '1400px', margin: '0 auto' }}>
+import { useIsMobile } from '../hooks/useIsMobile'
 
-      <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '80px' }}>
+export default function Stack() {
+  const isMobile = useIsMobile()
+
+  return (
+    <section id="stack" style={{ padding: isMobile ? '80px 24px' : '140px 100px', maxWidth: '1400px', margin: '0 auto' }}>
+
+      <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: isMobile ? '40px' : '80px' }}>
         <span style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '3px', color: '#7A7572' }}>04</span>
         <div style={{ height: '1px', width: '60px', background: '#C9A96E33' }} />
         <span style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '3px', color: '#C9A96E' }}>Stack</span>
       </div>
 
-      <div className="reveal" style={{ marginBottom: '64px' }}>
+      <div className="reveal" style={{ marginBottom: isMobile ? '40px' : '64px' }}>
         <h2 style={{
           fontFamily: 'var(--font-space)',
           fontSize: 'clamp(42px, 6vw, 80px)',
@@ -60,15 +64,20 @@ export default function Stack() {
         </h2>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: '#C9A96E0A' }}>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', 
+        gap: '1px', 
+        background: '#C9A96E0A' 
+      }}>
         {STACK.map((s, i) => (
           <div key={i} className="reveal" style={{
-            padding: '40px',
+            padding: isMobile ? '32px 24px' : '40px',
             background: '#0C0C0E',
             transition: 'background 0.3s',
           }}
-            onMouseEnter={e => e.currentTarget.style.background = '#0F0F14'}
-            onMouseLeave={e => e.currentTarget.style.background = '#0C0C0E'}
+            onMouseEnter={e => !isMobile && (e.currentTarget.style.background = '#0F0F14')}
+            onMouseLeave={e => !isMobile && (e.currentTarget.style.background = '#0C0C0E')}
           >
             <div style={{
               fontFamily: 'var(--font-space)',
@@ -94,14 +103,18 @@ export default function Stack() {
                   cursor: 'default',
                 }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = s.color
-                    e.currentTarget.style.color = s.color
-                    e.currentTarget.style.background = s.color + '11'
+                    if (!isMobile) {
+                      e.currentTarget.style.borderColor = s.color
+                      e.currentTarget.style.color = s.color
+                      e.currentTarget.style.background = s.color + '11'
+                    }
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = s.color + '22'
-                    e.currentTarget.style.color = '#9A9592'
-                    e.currentTarget.style.background = 'transparent'
+                    if (!isMobile) {
+                      e.currentTarget.style.borderColor = s.color + '22'
+                      e.currentTarget.style.color = '#9A9592'
+                      e.currentTarget.style.background = 'transparent'
+                    }
                   }}
                 >
                   {item}

@@ -1,13 +1,20 @@
 'use client'
 import { useEffect, useRef } from 'react'
 
+import { useIsMobile } from '../hooks/useIsMobile'
+
 export default function Cursor() {
   const dotRef = useRef(null)
   const ringRef = useRef(null)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
+    if (isMobile) return
+
     const dot = dotRef.current
     const ring = ringRef.current
+    if (!dot || !ring) return
+
     let mouseX = 0, mouseY = 0
     let ringX = 0, ringY = 0
 
@@ -37,7 +44,9 @@ export default function Cursor() {
 
     lerp()
     return () => window.removeEventListener('mousemove', onMove)
-  }, [])
+  }, [isMobile])
+
+  if (isMobile) return null
 
   return (
     <>

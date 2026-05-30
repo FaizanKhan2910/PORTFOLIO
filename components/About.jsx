@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 const STATS = [
   { value: 8, suffix: '+', label: 'Apps Shipped' },
@@ -32,6 +33,7 @@ function Counter({ value, suffix, active }) {
 export default function About() {
   const [statsVisible, setStatsVisible] = useState(false)
   const statsRef = useRef(null)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -43,10 +45,10 @@ export default function About() {
   }, [])
 
   return (
-    <section id="about" style={{ padding: '140px 100px', maxWidth: '1400px', margin: '0 auto' }}>
+    <section id="about" style={{ padding: isMobile ? '80px 24px' : '140px 100px', maxWidth: '1400px', margin: '0 auto' }}>
 
       {/* Section label */}
-      <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '80px' }}>
+      <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: isMobile ? '40px' : '80px' }}>
         <span style={{
           fontFamily: 'var(--font-space)',
           fontSize: '11px', letterSpacing: '3px',
@@ -64,7 +66,7 @@ export default function About() {
         </span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '40px' : '80px', alignItems: 'start' }}>
         {/* Left */}
         <div className="reveal">
           <h2 style={{
@@ -88,7 +90,7 @@ export default function About() {
         </div>
 
         {/* Right */}
-        <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingTop: '8px' }}>
+        <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingTop: isMobile ? '0' : '8px' }}>
           <p style={{
             fontFamily: 'var(--font-space)',
             fontSize: '17px', lineHeight: 1.8,
@@ -140,16 +142,20 @@ export default function About() {
 
       {/* Stats */}
       <div ref={statsRef} style={{
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '1px', marginTop: '100px',
-        border: '1px solid #C9A96E11', borderRadius: '2px',
+        display: 'grid', 
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+        gap: '1px', 
+        marginTop: isMobile ? '60px' : '100px',
+        background: '#C9A96E11', 
+        border: '1px solid #C9A96E11', 
+        borderRadius: '2px',
         overflow: 'hidden',
       }}>
         {STATS.map((s, i) => (
           <div key={i} className="reveal" style={{
-            padding: '40px 32px',
+            padding: isMobile ? '32px 16px' : '40px 32px',
             background: '#0F0F12',
-            borderRight: i < STATS.length - 1 ? '1px solid #C9A96E11' : 'none',
+            textAlign: isMobile ? 'center' : 'left',
           }}>
             <div style={{
               fontFamily: 'var(--font-space)',

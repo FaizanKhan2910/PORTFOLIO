@@ -54,19 +54,22 @@ const PROJECTS = [
   },
 ]
 
+import { useIsMobile } from '../hooks/useIsMobile'
+
 export default function Work() {
   const [hovered, setHovered] = useState(null)
+  const isMobile = useIsMobile()
 
   return (
-    <section id="work" style={{ padding: '140px 100px', maxWidth: '1400px', margin: '0 auto' }}>
+    <section id="work" style={{ padding: isMobile ? '80px 24px' : '140px 100px', maxWidth: '1400px', margin: '0 auto' }}>
 
-      <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '80px' }}>
+      <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: isMobile ? '40px' : '80px' }}>
         <span style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '3px', color: '#7A7572' }}>02</span>
         <div style={{ height: '1px', width: '60px', background: '#C9A96E33' }} />
         <span style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '3px', color: '#C9A96E' }}>Selected Work</span>
       </div>
 
-      <div className="reveal" style={{ marginBottom: '64px' }}>
+      <div className="reveal" style={{ marginBottom: isMobile ? '40px' : '64px' }}>
         <h2 style={{
           fontFamily: 'var(--font-space)',
           fontSize: 'clamp(42px, 6vw, 80px)',
@@ -93,10 +96,10 @@ export default function Work() {
             onMouseLeave={() => setHovered(null)}
             style={{
               background: hovered === i ? '#0F0F14' : '#0C0C0E',
-              padding: '40px 48px',
+              padding: isMobile ? '32px 16px' : '40px 48px',
               display: 'grid',
-              gridTemplateColumns: '80px 1fr auto',
-              gap: '40px',
+              gridTemplateColumns: isMobile ? '1fr' : '80px 1fr auto',
+              gap: isMobile ? '16px' : '40px',
               alignItems: 'start',
               transition: 'background 0.3s ease',
               cursor: 'none',
@@ -106,7 +109,8 @@ export default function Work() {
             <div style={{
               fontFamily: 'var(--font-space)', fontSize: '12px',
               letterSpacing: '2px', color: '#7A7572',
-              paddingTop: '6px',
+              paddingTop: isMobile ? '0' : '6px',
+              marginBottom: isMobile ? '8px' : '0',
             }}>
               {p.num}
             </div>
@@ -134,6 +138,9 @@ export default function Work() {
                     border: '1px solid #C9A96E44',
                     color: '#C9A96E',
                     borderRadius: '2px',
+                    width: isMobile ? '100%' : 'auto',
+                    textAlign: isMobile ? 'center' : 'left',
+                    marginTop: isMobile ? '4px' : '0',
                   }}>
                     🏆 {p.award}
                   </span>
@@ -167,7 +174,16 @@ export default function Work() {
             </div>
 
             {/* Right: year + link */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px', paddingTop: '4px' }}>
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: isMobile ? 'row-reverse' : 'column', 
+              alignItems: isMobile ? 'center' : 'flex-end', 
+              justifyContent: isMobile ? 'space-between' : 'flex-start',
+              gap: '12px', 
+              paddingTop: isMobile ? '16px' : '4px',
+              borderTop: isMobile ? '1px solid #C9A96E11' : 'none',
+              marginTop: isMobile ? '8px' : '0'
+            }}>
               <span style={{ fontFamily: 'var(--font-space)', fontSize: '12px', color: '#7A7572' }}>{p.year}</span>
               <a
                 href={p.link} target="_blank" rel="noopener noreferrer"
