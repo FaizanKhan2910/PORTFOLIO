@@ -120,7 +120,6 @@ export default function Hero() {
             position: 'relative', margin: '0 auto',
             marginBottom: '24px',
             zIndex: 1,
-            pointerEvents: 'none',
           }}>
             <SplineCharacter />
           </div>
@@ -265,7 +264,7 @@ export default function Hero() {
             width: '100%',
             height: '100%',
             zIndex: 1,
-            pointerEvents: 'none',
+            pointerEvents: 'auto',
           }}>
             <SplineCharacter />
           </div>
