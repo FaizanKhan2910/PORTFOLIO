@@ -8,17 +8,19 @@
     "start": "next start"
   },
   "dependencies": {
-    "next": "14.2.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
-    "three": "^0.164.0",
-    "@react-three/fiber": "^8.16.0",
     "@react-three/drei": "^9.105.0",
+    "@react-three/fiber": "^8.16.0",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.95",
+    "autoprefixer": "^10.4.0",
     "framer-motion": "^11.1.0",
     "gsap": "^3.12.5",
     "lenis": "^1.1.2",
-    "tailwindcss": "^3.4.0",
+    "next": "14.2.0",
     "postcss": "^8.4.0",
-    "autoprefixer": "^10.4.0"
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "tailwindcss": "^3.4.0",
+    "three": "^0.164.0"
   }
 }

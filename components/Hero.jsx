@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useIsMobile } from '../hooks/useIsMobile'
 
-const ThreeSphere = dynamic(() => import('./ThreeSphere'), { ssr: false })
+const SplineCharacter = dynamic(() => import('./SplineCharacter'), { ssr: false })
 
 const ROLES = ['FULL-STACK DEVELOPER', 'AI / ML BUILDER', 'HACKATHON WINNER', 'OPEN TO INTERNSHIPS']
 
@@ -114,13 +114,14 @@ export default function Hero() {
             </span>
           </h1>
 
-          {/* Center: Three.js */}
+          {/* Center: Spline */}
           <div style={{
-            width: '260px', height: '260px',
+            width: '100%', height: '400px',
             position: 'relative', margin: '0 auto',
-            marginBottom: '24px'
+            marginBottom: '24px',
+            zIndex: 1,
           }}>
-            <ThreeSphere />
+            <SplineCharacter />
           </div>
 
           {/* Roles */}
@@ -256,15 +257,16 @@ export default function Hero() {
             </h1>
           </div>
 
-          {/* Center: Three.js */}
+          {/* Center: Spline */}
           <div style={{
             position: 'absolute',
-            left: '50%', top: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 'clamp(300px, 40vw, 560px)',
-            height: 'clamp(300px, 40vw, 560px)',
+            inset: 0, // Top 0, bottom 0, left 0, right 0
+            width: '100%',
+            height: '100%',
+            zIndex: 1,
+            pointerEvents: 'auto',
           }}>
-            <ThreeSphere />
+            <SplineCharacter />
           </div>
 
           {/* Right: Role */}
