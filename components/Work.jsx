@@ -10,6 +10,7 @@ const PROJECTS = [
     desc: 'End-to-end AI diagnostic pipeline. Upload a dental X-ray — get cavity detection, LLM treatment reasoning, and a patient-ready PDF report in seconds. Built in 24 hours.',
     award: '1st Place · National · 70+ teams',
     link: 'https://github.com/FaizanKhan2910/DENTRA_AI',
+    live: 'https://dentra-ai.vercel.app/',
     year: '2026',
   },
   {
@@ -20,6 +21,7 @@ const PROJECTS = [
     desc: 'Production AI image-generation SaaS with credit-based billing. Stripe payment processing, JWT auth, CDN-optimised delivery. 100+ transactions/month, 50+ concurrent users.',
     award: null,
     link: 'https://github.com/FaizanKhan2910/SigmaGPT',
+    live: 'https://sigmagpt-1-ewdw.onrender.com',
     year: '2025',
   },
   {
@@ -30,6 +32,7 @@ const PROJECTS = [
     desc: 'Multimodal biometric authentication — gesture recognition, voice-liveness detection, spoof prevention, and emergency SOS. Production-grade system built in 24 hours.',
     award: '1st Place · National · 70+ teams',
     link: 'https://github.com/FaizanKhan2910/NEXUS_AUTHENTICATION',
+    live: 'https://code-jss.vercel.app/',
     year: '2026',
   },
   {
@@ -50,6 +53,7 @@ const PROJECTS = [
     desc: 'High-performance AI code analysis platform. Features real-time complexity visualisation and intelligent code documentation generation.',
     award: '1st Place · CODEFORGE 2K25',
     link: 'https://github.com/FaizanKhan2910/AI-Code-Analyzer',
+    live: 'https://code-rnsit-1.onrender.com',
     year: '2025',
   },
 ]
@@ -185,31 +189,61 @@ export default function Work() {
               marginTop: isMobile ? '8px' : '0'
             }}>
               <span style={{ fontFamily: 'var(--font-space)', fontSize: '12px', color: '#7A7572' }}>{p.year}</span>
-              <a
-                href={p.link} target="_blank" rel="noopener noreferrer"
-                style={{
-                  width: '40px', height: '40px',
-                  border: '1px solid #C9A96E22',
-                  borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#7A7572',
-                  textDecoration: 'none',
-                  fontSize: '16px',
-                  transition: 'all 0.3s',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = '#C9A96E'
-                  e.currentTarget.style.color = '#C9A96E'
-                  e.currentTarget.style.transform = 'rotate(45deg)'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = '#C9A96E22'
-                  e.currentTarget.style.color = '#7A7572'
-                  e.currentTarget.style.transform = 'rotate(0deg)'
-                }}
-              >
-                ↗
-              </a>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <a
+                  href={p.link} target="_blank" rel="noopener noreferrer"
+                  title="GitHub Repository"
+                  style={{
+                    width: '40px', height: '40px',
+                    border: '1px solid #C9A96E22',
+                    borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#7A7572',
+                    textDecoration: 'none',
+                    fontSize: '13px',
+                    fontFamily: 'var(--font-space)',
+                    transition: 'all 0.3s',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = '#C9A96E'
+                    e.currentTarget.style.color = '#C9A96E'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = '#C9A96E22'
+                    e.currentTarget.style.color = '#7A7572'
+                  }}
+                >
+                  GH
+                </a>
+                {p.live && (
+                  <a
+                    href={p.live} target="_blank" rel="noopener noreferrer"
+                    title="Live Demo"
+                    style={{
+                      width: '40px', height: '40px',
+                      border: '1px solid #C9A96E22',
+                      borderRadius: '50%',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#7A7572',
+                      textDecoration: 'none',
+                      fontSize: '16px',
+                      transition: 'all 0.3s',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = '#C9A96E'
+                      e.currentTarget.style.color = '#C9A96E'
+                      e.currentTarget.style.transform = 'rotate(45deg)'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = '#C9A96E22'
+                      e.currentTarget.style.color = '#7A7572'
+                      e.currentTarget.style.transform = 'rotate(0deg)'
+                    }}
+                  >
+                    ↗
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         ))}
