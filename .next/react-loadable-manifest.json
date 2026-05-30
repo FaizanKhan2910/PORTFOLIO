@@ -1,1 +1,16 @@
-{}
+{
+  "components/Hero.jsx -> ./ThreeSphere": {
+    "id": "components/Hero.jsx -> ./ThreeSphere",
+    "files": [
+      "static/chunks/_app-pages-browser_components_ThreeSphere_jsx.js"
+    ]
+  },
+  "node_modules/@react-three/drei/core/VideoTexture.js -> hls.js": {
+    "id": "node_modules/@react-three/drei/core/VideoTexture.js -> hls.js",
+    "files": []
+  },
+  "node_modules/@react-three/drei/web/FaceLandmarker.js -> @mediapipe/tasks-vision": {
+    "id": "node_modules/@react-three/drei/web/FaceLandmarker.js -> @mediapipe/tasks-vision",
+    "files": []
+  }
+}
