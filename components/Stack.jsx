@@ -8,12 +8,12 @@ const STACK = [
   },
   {
     category: 'Frontend',
-    items: ['React 19', 'Next.js', 'Vite', 'TailwindCSS', 'Redux Toolkit', 'Framer Motion'],
+    items: ['React 19', 'Next.js', 'HTML5', 'CSS3', 'Material UI', 'Bootstrap', 'Vite', 'TailwindCSS', 'Redux Toolkit', 'Framer Motion'],
     color: '#D4847A',
   },
   {
     category: 'Backend',
-    items: ['Node.js', 'Express.js', 'REST APIs', 'FastAPI', 'WebSockets', 'JWT Auth'],
+    items: ['Node.js', 'Express.js', 'REST APIs', 'WebSockets', 'JWT Auth'],
     color: '#C9A96E',
   },
   {
@@ -21,11 +21,7 @@ const STACK = [
     items: ['MongoDB', 'MongoDB Atlas', 'PostgreSQL', 'Supabase'],
     color: '#D4847A',
   },
-  {
-    category: 'AI / ML',
-    items: ['YOLOv8', 'Llama-3', 'Gemini API', 'Computer Vision', 'FastAPI + ML'],
-    color: '#C9A96E',
-  },
+
   {
     category: 'DevOps',
     items: ['Docker', 'GitHub Actions', 'CI/CD', 'Render', 'Kubernetes'],
@@ -64,11 +60,11 @@ export default function Stack() {
         </h2>
       </div>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', 
-        gap: '1px', 
-        background: '#C9A96E0A' 
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+        gap: '1px',
+        background: '#C9A96E0A'
       }}>
         {STACK.map((s, i) => (
           <div key={i} className="reveal" style={{
