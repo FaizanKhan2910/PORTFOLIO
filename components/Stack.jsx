@@ -13,7 +13,7 @@ const STACK = [
   },
   {
     category: 'Backend',
-    items: ['Node.js', 'Express.js', 'REST APIs', 'WebSockets', 'JWT Auth'],
+    items: ['Node.js', 'Express.js', 'Postman', 'REST APIs', 'WebSockets', 'JWT Auth'],
     color: '#C9A96E',
   },
   {
