@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useIsMobile } from '../hooks/useIsMobile'
 
@@ -47,7 +47,25 @@ export default function Hero() {
   const [roleIndex, setRoleIndex] = useState(0)
   const [displayed, setDisplayed] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const [hasSpoken, setHasSpoken] = useState(false)
   const isMobile = useIsMobile()
+
+  const handleFirstClick = () => {
+    if (!hasSpoken) {
+      setHasSpoken(true);
+
+      // Cancel any stuck utterances
+      window.speechSynthesis.cancel();
+
+      const text = "Hi, I'm Faizan's digital assistant. Faizan is a 2nd-year AIML student, 3-time hackathon winner, and passionate software developer. He builds AI-powered products, full-stack applications, and innovative solutions designed to create real-world impact.";
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.2; // 1.5 is sometimes too fast for default voices and can cause them to fail
+      utterance.pitch = 1;
+
+      // Speak synchronously so the browser registers it as a direct user action
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   useEffect(() => {
     const target = ROLES[roleIndex]
@@ -70,12 +88,24 @@ export default function Hero() {
   return (
     <section style={{
       height: '100vh', position: 'relative',
-      display: 'flex', 
+      display: 'flex',
       alignItems: 'center',
       justifyContent: isMobile ? 'center' : 'flex-start',
       overflow: 'hidden',
     }}>
-      
+
+      {!hasSpoken && (
+        <div
+          onClick={handleFirstClick}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 9999,
+            cursor: 'pointer'
+          }}
+        />
+      )}
+
       {isMobile ? (
         // MOBILE LAYOUT
         <div style={{
@@ -202,7 +232,7 @@ export default function Hero() {
                   border: '1px solid #C9A96E44',
                   borderRadius: '50%',
                   fontFamily: 'var(--font-space)',
-                  color: '#C5C1BD', 
+                  color: '#C5C1BD',
                   textDecoration: 'none',
                   transition: 'all 0.3s ease',
                 }}
@@ -246,7 +276,7 @@ export default function Hero() {
               letterSpacing: '-3px',
               color: '#F0ECE3',
             }}>
-              FAIZAN<br />
+              FAIZAN <br />
               <span style={{
                 background: 'linear-gradient(135deg, #C9A96E, #F0ECE3)',
                 WebkitBackgroundClip: 'text',
@@ -313,7 +343,7 @@ export default function Hero() {
 
           {/* Resume button */}
           <a
-            href="/resume.pdf"
+            href="/Faizan_5.pdf"
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -348,7 +378,7 @@ export default function Hero() {
           </div>
         </>
       )}
-      
+
       <style>{`
         @keyframes blink { 50% { opacity: 0; } }
         @keyframes scrollPulse { 0%,100%{opacity:0.3}50%{opacity:1} }

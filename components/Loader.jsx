@@ -12,7 +12,7 @@ export default function Loader({ onComplete }) {
     const tick = (ts) => {
       if (!start) start = ts
       const progress = Math.min((ts - start) / duration, 1)
-      // Ease out cubic
+      // Ease out cubic i 
       const eased = 1 - Math.pow(1 - progress, 3)
       setCount(Math.floor(eased * 100))
 

@@ -100,7 +100,7 @@ export default function About() {
             <span style={{ color: '#C9A96E' }}>JSSATE Bengaluru</span>.
             I build production-grade applications — from AI dental diagnostic systems
             that fuse YOLOv8 with Llama-3, to fintech dashboards handling 100+
-            concurrent positions in real time.
+            concurrent positions in real time....
           </p>
           <p style={{
             fontFamily: 'var(--font-space)',
@@ -109,7 +109,7 @@ export default function About() {
           }}>
             <span style={{ color: '#D4847A', fontWeight: 600 }}>3× National and Inter-Collegiate Hackathon Winner .</span>{' '}
             I have competed against 170+ teams across national and inter-collegiate competitions
-            and secured first place every single time.
+            and secured first place every single time...
           </p>
           <p style={{
             fontFamily: 'var(--font-space)',
@@ -142,12 +142,12 @@ export default function About() {
 
       {/* Stats */}
       <div ref={statsRef} style={{
-        display: 'grid', 
+        display: 'grid',
         gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-        gap: '1px', 
+        gap: '1px',
         marginTop: isMobile ? '60px' : '100px',
-        background: '#C9A96E11', 
-        border: '1px solid #C9A96E11', 
+        background: '#C9A96E11',
+        border: '1px solid #C9A96E11',
         borderRadius: '2px',
         overflow: 'hidden',
       }}>

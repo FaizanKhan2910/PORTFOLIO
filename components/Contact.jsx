@@ -100,7 +100,7 @@ export default function Contact() {
             </a>
 
             <a
-              href="/resume.pdf"
+              href="/Faizan_5.pdf"
               target="_blank"
               rel="noopener noreferrer"
               style={{
