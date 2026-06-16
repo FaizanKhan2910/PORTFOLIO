@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
 
 const STATS = [
-  { value: 8, suffix: '+', label: 'Apps Shipped' },
+  { value: 6, suffix: '+', label: 'Apps Shipped' },
   { value: 3, suffix: '×', label: 'Hackathon Wins' },
   { value: 170, suffix: '+', label: 'Teams Defeated' },
   { value: 1224, suffix: '', label: 'LinkedIn Followers' },
