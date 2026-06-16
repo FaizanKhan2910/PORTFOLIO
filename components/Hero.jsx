@@ -295,6 +295,13 @@ export default function Hero() {
             height: '100%',
             zIndex: 1,
             pointerEvents: 'auto',
+            background: 'linear-gradient(135deg, #C9A96E, #F0ECE3)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontFamily: 'var(--font-space)',
+            fontSize: '13px',
+            letterSpacing: '2px',
+            marginBottom: '12px',
           }}>
             <SplineCharacter />
           </div>
