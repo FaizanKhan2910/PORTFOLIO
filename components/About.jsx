@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
+import AboutTerminal from './AboutTerminal'
 
 const STATS = [
   { value: 6, suffix: '+', label: 'Apps Shipped' },
@@ -139,6 +140,8 @@ export default function About() {
           </a>
         </div>
       </div>
+
+      <AboutTerminal />
 
       {/* Stats */}
       <div ref={statsRef} style={{
