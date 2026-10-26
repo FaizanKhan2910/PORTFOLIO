@@ -101,16 +101,16 @@ export default function About() {
             <span style={{ color: '#C9A96E' }}>JSSATE Bengaluru</span>.
             I build production-grade applications — from AI dental diagnostic systems
             that fuse YOLOv8 with Llama-3, to fintech dashboards handling 100+
-            concurrent positions in real time....
+            concurrent positions in real time.
           </p>
           <p style={{
             fontFamily: 'var(--font-space)',
             fontSize: '17px', lineHeight: 1.8,
             color: '#9A9592',
           }}>
-            <span style={{ color: '#D4847A', fontWeight: 600 }}>3× National and Inter-Collegiate Hackathon Winner .</span>{' '}
+            <span style={{ color: '#D4847A', fontWeight: 600 }}>3× National and Inter-Collegiate Hackathon Winner.</span>{' '}
             I have competed against 170+ teams across national and inter-collegiate competitions
-            and secured first place every single time...
+            and secured first place every single time.
           </p>
           <p style={{
             fontFamily: 'var(--font-space)',

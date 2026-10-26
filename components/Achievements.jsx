@@ -140,6 +140,63 @@ export default function Achievements() {
             </div>
           ))}
         </div>
+
+        {/* DSA Milestone Callout */}
+        <div className="reveal" style={{
+          marginTop: isMobile ? '48px' : '72px',
+          padding: isMobile ? '24px 20px' : '32px 40px',
+          background: '#0F0F14',
+          border: '1px solid #C9A96E22',
+          borderRadius: '2px',
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          justifyContent: 'space-between',
+          gap: '20px',
+        }}>
+          <div>
+            <div style={{
+              fontFamily: 'var(--font-space)',
+              fontSize: '11px',
+              letterSpacing: '2px',
+              color: '#C9A96E',
+              textTransform: 'uppercase',
+              marginBottom: '6px',
+            }}>
+              Algorithmic Problem Solving
+            </div>
+            <div style={{
+              fontFamily: 'var(--font-space)',
+              fontSize: 'clamp(20px, 2.2vw, 26px)',
+              fontWeight: 700,
+              color: '#F0ECE3',
+              letterSpacing: '-0.5px',
+            }}>
+              400+ DSA Problems Solved
+            </div>
+            <p style={{
+              fontFamily: 'var(--font-space)',
+              fontSize: '14px',
+              color: '#9A9592',
+              marginTop: '6px',
+              lineHeight: 1.6,
+            }}>
+              Rigorous problem solving across LeetCode & GeeksforGeeks covering advanced data structures, algorithms, and dynamic programming.
+            </p>
+          </div>
+          <div style={{
+            fontFamily: 'var(--font-space)',
+            fontSize: 'clamp(32px, 3.5vw, 44px)',
+            fontWeight: 700,
+            background: 'linear-gradient(135deg, #C9A96E, #D4847A)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '-1px',
+            whiteSpace: 'nowrap',
+          }}>
+            400+ Solved
+          </div>
+        </div>
       </div>
     </section>
   )

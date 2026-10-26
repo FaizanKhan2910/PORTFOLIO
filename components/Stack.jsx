@@ -13,7 +13,7 @@ const STACK = [
   },
   {
     category: 'Backend',
-    items: ['Node.js', 'Express.js', 'Postman', 'REST APIs', 'WebSockets', 'JWT Auth'],
+    items: ['Node.js', 'Express.js', 'FastAPI', 'REST APIs', 'WebSockets', 'JWT Auth', 'Bcrypt', 'Postman', 'Jest'],
     color: '#C9A96E',
   },
   {
@@ -24,7 +24,7 @@ const STACK = [
 
   {
     category: 'DevOps',
-    items: ['Docker', 'GitHub Actions', 'CI/CD', 'Render', 'Kubernetes'],
+    items: ['Docker', 'Git', 'GitHub Actions', 'CI/CD', 'Render', 'Kubernetes'],
     color: '#D4847A',
   },
 ]

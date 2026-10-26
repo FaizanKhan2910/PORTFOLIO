@@ -368,7 +368,7 @@ export default function Hero() {
 
           {/* Full width resume button */}
           <a
-            href="/resume.pdf" target="_blank" rel="noopener noreferrer"
+            href="/Faizan_5.pdf" target="_blank" rel="noopener noreferrer"
             style={{
               width: '100%', padding: '16px 0',
               border: '1px solid #C9A96E',

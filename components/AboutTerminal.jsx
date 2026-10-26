@@ -42,9 +42,9 @@ const HELP_LINES = [
 const SKILLS_LINES = [
   'languages/  → javascript · typescript · python · java',
   'frontend/   → react 19 · next.js · tailwind · framer-motion · redux',
-  'backend/    → node.js · express · rest · websockets · jwt',
+  'backend/    → node.js · express · fastapi · rest · websockets · jwt · bcrypt',
   'databases/  → mongodb · postgresql · supabase',
-  'devops/     → docker · kubernetes · github-actions · render',
+  'devops/     → docker · git · kubernetes · github-actions · render',
 ]
 
 const PROJECT_LINES = [
