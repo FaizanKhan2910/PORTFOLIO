@@ -8,8 +8,13 @@
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_globals_css-node_modules_next_font_google_target_css-node_modules_next_font_google_ta-77a3b2.css",
+      "static/css/css-ai_assistant_css-app_globals_css-node_modules_next_font_google_target_css-node_modules_ne-375f68.css",
       "static/chunks/app/layout.js"
+    ],
+    "/dsa/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dsa/page.js"
     ]
   }
 }

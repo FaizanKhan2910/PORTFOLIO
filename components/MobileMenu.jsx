@@ -1,5 +1,6 @@
 'use client'
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 const SOCIALS = [
   { label: 'GitHub', href: 'https://github.com/FaizanKhan2910' },
@@ -8,23 +9,23 @@ const SOCIALS = [
 ]
 
 export default function MobileMenu({ isOpen, onClose }) {
-  // Prevent scrolling on body when menu is open
+  const router = useRouter()
+
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : 'unset'
+    return () => { document.body.style.overflow = 'unset' }
   }, [isOpen])
 
   const scrollTo = (id) => {
     onClose()
-    setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-    }, 300)
+    // If not on home page, navigate there first then scroll
+    if (window.location.pathname !== '/') {
+      router.push(`/#${id}`)
+    } else {
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+      }, 300)
+    }
   }
 
   return (
@@ -38,7 +39,7 @@ export default function MobileMenu({ isOpen, onClose }) {
       pointerEvents: isOpen ? 'all' : 'none',
     }}>
       {/* Close button */}
-      <button 
+      <button
         onClick={onClose}
         style={{
           position: 'absolute', top: '24px', right: '24px',
@@ -51,19 +52,56 @@ export default function MobileMenu({ isOpen, onClose }) {
       </button>
 
       {/* Links */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
+        {/* DSA — scrolls to #dsa section */}
+        <button
+          onClick={() => scrollTo('dsa')}
+          style={{
+            background: 'none', border: 'none',
+            fontFamily: 'var(--font-space)',
+            fontSize: '36px', fontWeight: 700,
+            textTransform: 'uppercase', color: '#C9A96E',
+            cursor: 'pointer',
+            opacity: isOpen ? 1 : 0,
+            transform: isOpen ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'all 0.4s cubic-bezier(0.76, 0, 0.24, 1) 0.08s',
+          }}
+        >
+          DSA
+        </button>
+
+        {/* Resume */}
+        <a
+          href="/resume.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={onClose}
+          style={{
+            fontFamily: 'var(--font-space)',
+            fontSize: '32px', fontWeight: 700,
+            textTransform: 'uppercase', color: '#C9A96E',
+            textDecoration: 'none',
+            opacity: isOpen ? 1 : 0,
+            transform: isOpen ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'all 0.4s cubic-bezier(0.76, 0, 0.24, 1) 0.12s',
+          }}
+        >
+          Resume ↗
+        </a>
+
         {['about', 'work', 'achievements', 'stack', 'contact'].map((item, index) => (
-          <button 
-            key={item} 
+          <button
+            key={item}
             onClick={() => scrollTo(item)}
             style={{
               background: 'none', border: 'none',
               fontFamily: 'var(--font-space)',
-              fontSize: '40px', fontWeight: 700,
-              textTransform: 'uppercase', color: '#F0ECE3',
+              fontSize: '32px', fontWeight: 700,
+              textTransform: 'uppercase', color: '#B3ADA9',
+              cursor: 'pointer',
               opacity: isOpen ? 1 : 0,
               transform: isOpen ? 'translateY(0)' : 'translateY(20px)',
-              transition: `all 0.4s cubic-bezier(0.76, 0, 0.24, 1) ${0.1 + index * 0.05}s`,
+              transition: `all 0.4s cubic-bezier(0.76, 0, 0.24, 1) ${0.16 + index * 0.04}s`,
             }}
           >
             {item}
@@ -71,7 +109,7 @@ export default function MobileMenu({ isOpen, onClose }) {
         ))}
       </div>
 
-      {/* Social Icons row */}
+      {/* Socials */}
       <div style={{
         position: 'absolute', bottom: '40px',
         display: 'flex', gap: '24px',

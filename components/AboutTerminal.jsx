@@ -14,12 +14,12 @@ const BOOT_CMDS = [
     output: [
       '# faizan khan',
       '',
-      '2nd-year CSE (AI-ML) student at JSSATE Bengaluru.',
+      'Pre-final year CSE (AI & ML) student at JSSATE Bengaluru.',
       'I build production-grade apps — from AI dental diagnostics',
       '(YOLOv8 + Llama-3) to fintech dashboards handling 100+',
       'concurrent positions in real time.',
       '',
-      '3x hackathon winner vs 170+ teams. I ship it.',
+      '3x hackathon winner vs 796+ students. I ship it.',
     ],
   },
   {

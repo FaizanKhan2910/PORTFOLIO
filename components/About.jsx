@@ -6,7 +6,7 @@ import AboutTerminal from './AboutTerminal'
 const STATS = [
   { value: 6, suffix: '+', label: 'Apps Shipped' },
   { value: 3, suffix: '×', label: 'Hackathon Wins' },
-  { value: 170, suffix: '+', label: 'Teams Defeated' },
+  { value: 796, suffix: '+', label: 'Students Defeated' },
   { value: 1224, suffix: '', label: 'LinkedIn Followers' },
 ]
 
@@ -97,7 +97,7 @@ export default function About() {
             fontSize: '17px', lineHeight: 1.8,
             color: '#9A9592',
           }}>
-            2nd-year CSE (AI-ML) student at{' '}
+            Pre-final year CSE (AI & ML) student at{' '}
             <span style={{ color: '#C9A96E' }}>JSSATE Bengaluru</span>.
             I build production-grade applications — from AI dental diagnostic systems
             that fuse YOLOv8 with Llama-3, to fintech dashboards handling 100+
@@ -109,7 +109,7 @@ export default function About() {
             color: '#9A9592',
           }}>
             <span style={{ color: '#D4847A', fontWeight: 600 }}>3× National and Inter-Collegiate Hackathon Winner.</span>{' '}
-            I have competed against 170+ teams across national and inter-collegiate competitions
+            I have competed against 796+ students across national and inter-collegiate competitions
             and secured first place every single time.
           </p>
           <p style={{

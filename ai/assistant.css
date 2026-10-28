@@ -1,0 +1,809 @@
+/* ai/assistant.css
+   Futuristic, dark sci-fi aesthetic with subtle cyan glow.
+   3D AI Robot Agent with loading expansion, docking, high-jump, and smiling effects. */
+
+.fkai-root {
+  --fk-cyan: #00e5ff;
+  --fk-cyan-bright: #6effff;
+  --fk-cyan-dim: rgba(0, 229, 255, 0.28);
+  --fk-cyan-subtle: rgba(0, 229, 255, 0.08);
+  --fk-gold: #c8a97a;
+  --fk-bg-panel: #0d1017;
+  --fk-bg-chat: #090b0f;
+  --fk-bubble-bot: #141822;
+  --fk-bubble-user: #0e2433;
+  --fk-border: rgba(0, 229, 255, 0.18);
+  --fk-border-subtle: rgba(255, 255, 255, 0.08);
+  --fk-text: #f1ede4;
+  --fk-muted: #8b949e;
+  font-family: var(--font-space), "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   3D ROBOT AVATAR CONTAINER & GLOW RIMS
+   ========================================================================== */
+
+.fkai-robot-3d {
+  position: relative;
+  border-radius: 50%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 229, 255, 0.45);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 0.25s ease;
+  overflow: visible;
+}
+
+.fkai-robot-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+  transition: filter 0.3s ease;
+}
+
+/* Outer cyan/gold rim glow */
+.fkai-rim-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, var(--fk-cyan) 0%, rgba(0, 229, 255, 0.2) 50%, var(--fk-gold) 100%) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.6));
+}
+
+/* Smiling / Joyful state */
+.fkai-robot-3d.smiling .fkai-robot-img {
+  filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.8)) brightness(1.08);
+}
+
+.fkai-robot-3d.smiling .fkai-rim-glow {
+  filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.9));
+  animation: fkai-rim-spin 3s linear infinite;
+}
+
+@keyframes fkai-rim-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* High Jump Jet Trail Effect */
+.fkai-jet-trail {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at top, #00e5ff 0%, rgba(0, 229, 255, 0.4) 40%, transparent 80%);
+  filter: blur(4px);
+  pointer-events: none;
+  animation: fkai-jet-flicker 0.15s infinite alternate;
+}
+
+@keyframes fkai-jet-flicker {
+  0% { opacity: 0.7; transform: translateX(-50%) scaleY(0.9); }
+  100% { opacity: 1; transform: translateX(-50%) scaleY(1.2); }
+}
+
+/* Sparkle overlay */
+.fkai-smile-sparkle {
+  position: absolute;
+  inset: -8px;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+}
+
+.fkai-smile-sparkle .sparkle {
+  font-size: 16px;
+  animation: fkai-sparkle-float 1.2s ease-out infinite alternate;
+}
+
+.fkai-smile-sparkle .sparkle-1 {
+  align-self: flex-start;
+}
+
+.fkai-smile-sparkle .sparkle-2 {
+  align-self: flex-end;
+}
+
+@keyframes fkai-sparkle-float {
+  0% { transform: translateY(0) scale(0.8); opacity: 0.5; }
+  100% { transform: translateY(-8px) scale(1.2); opacity: 1; }
+}
+
+/* ==========================================================================
+   FLOATING ROBOT TRIGGER BUTTON (FAB)
+   ========================================================================== */
+
+.fkai-fab {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 9999;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.fkai-fab:hover .fkai-robot-3d {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 28px rgba(0, 229, 255, 0.65);
+  transform: scale(1.06);
+}
+
+/* Pulsating radar ring */
+.fkai-radar-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--fk-cyan);
+  pointer-events: none;
+  animation: fkai-radar 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+@keyframes fkai-radar {
+  0% { transform: scale(0.94); opacity: 0.85; }
+  70% { transform: scale(1.45); opacity: 0; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+.fkai-fab-close {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(13, 16, 23, 0.95);
+  border: 1.5px solid var(--fk-cyan);
+  color: var(--fk-cyan);
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.4);
+}
+
+/* ==========================================================================
+   FLOATING THOUGHT BUBBLE INVITATION
+   ========================================================================== */
+
+.fkai-hint {
+  position: fixed;
+  right: 28px;
+  bottom: 106px;
+  z-index: 9998;
+  max-width: 260px;
+  padding: 10px 14px;
+  border-radius: 14px 14px 4px 14px;
+  background: rgba(13, 16, 23, 0.94);
+  border: 1px solid var(--fk-cyan-dim);
+  color: var(--fk-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), 0 0 16px rgba(0, 229, 255, 0.18);
+  user-select: none;
+}
+
+.fkai-hint:hover {
+  border-color: var(--fk-cyan);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), 0 0 22px rgba(0, 229, 255, 0.35);
+}
+
+/* ==========================================================================
+   WHATSAPP-INSPIRED SCI-FI CHAT WINDOW
+   ========================================================================== */
+
+.fkai-panel {
+  position: fixed;
+  right: 28px;
+  bottom: 106px;
+  z-index: 9999;
+  width: min(390px, calc(100vw - 32px));
+  height: min(580px, calc(100vh - 120px));
+  display: flex;
+  flex-direction: column;
+  background: var(--fk-bg-panel);
+  border: 1px solid var(--fk-border);
+  border-radius: 20px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85), 0 0 32px rgba(0, 229, 255, 0.15);
+  overflow: hidden;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transform-origin: bottom right;
+}
+
+/* Header */
+.fkai-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(9, 12, 17, 0.96);
+  border-bottom: 1px solid var(--fk-border-subtle);
+}
+
+.fkai-title {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.fkai-title strong {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--fk-text);
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fkai-title span {
+  font-size: 11px;
+  color: var(--fk-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.2px;
+}
+
+.fkai-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00e5ff;
+  box-shadow: 0 0 6px #00e5ff;
+  display: inline-block;
+  animation: fkai-dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes fkai-dot-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.fkai-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fkai-icon-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--fk-muted);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fkai-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--fk-border-subtle);
+  color: var(--fk-text);
+}
+
+.fkai-icon-btn.active {
+  color: var(--fk-cyan);
+  border-color: var(--fk-cyan-dim);
+  background: var(--fk-cyan-subtle);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
+}
+
+/* Messages area with micro-dot wallpaper */
+.fkai-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--fk-bg-chat);
+  background-image: radial-gradient(rgba(0, 229, 255, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+  scroll-behavior: smooth;
+}
+
+.fkai-list::-webkit-scrollbar {
+  width: 5px;
+}
+.fkai-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.fkai-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+.fkai-list::-webkit-scrollbar-thumb:hover {
+  background: var(--fk-cyan-dim);
+}
+
+.fkai-row {
+  display: flex;
+  width: 100%;
+}
+
+.fkai-row.fkai-user {
+  justify-content: flex-end;
+}
+
+.fkai-row.fkai-assistant {
+  justify-content: flex-start;
+}
+
+.fkai-bubble {
+  position: relative;
+  max-width: 86%;
+  padding: 12px 16px 10px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.fkai-assistant .fkai-bubble {
+  background: var(--fk-bubble-bot);
+  border: 1px solid var(--fk-border-subtle);
+  border-top-left-radius: 3px;
+  color: var(--fk-text);
+}
+
+.fkai-user .fkai-bubble {
+  background: linear-gradient(135deg, #0e2a3c 0%, #0a1f2e 100%);
+  border: 1px solid var(--fk-cyan-dim);
+  border-top-right-radius: 3px;
+  color: #e9f8ff;
+  box-shadow: 0 4px 16px rgba(0, 229, 255, 0.12);
+}
+
+/* Structured message layout & spacing */
+.fkai-formatted-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fkai-content-p {
+  margin: 0;
+  line-height: 1.62;
+  color: inherit;
+}
+
+.fkai-content-list {
+  margin: 4px 0 6px 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fkai-content-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.55;
+}
+
+.fkai-bullet-dot {
+  color: var(--fk-cyan);
+  font-size: 11px;
+  line-height: 1.8;
+  flex-shrink: 0;
+  text-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
+}
+
+.fkai-highlight {
+  color: #00e5ff;
+  font-weight: 600;
+}
+
+
+.fkai-meta {
+  display: block;
+  margin-top: 3px;
+  text-align: right;
+  font-size: 10px;
+  color: var(--fk-muted);
+  opacity: 0.75;
+}
+
+.fkai-ticks {
+  color: var(--fk-cyan);
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+/* Typing Indicator Animation */
+.fkai-typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 16px;
+}
+
+.fkai-typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fk-cyan);
+  box-shadow: 0 0 6px var(--fk-cyan);
+  animation: fkai-typing-dot 1.2s infinite ease-in-out;
+}
+
+.fkai-typing i:nth-child(2) { animation-delay: 0.2s; }
+.fkai-typing i:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes fkai-typing-dot {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* Quick Question Chip Buttons */
+.fkai-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 12px;
+  background: rgba(13, 16, 23, 0.95);
+  border-top: 1px solid var(--fk-border-subtle);
+  scrollbar-width: none;
+}
+
+.fkai-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.fkai-chips button {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--fk-cyan-dim);
+  background: rgba(0, 229, 255, 0.04);
+  color: var(--fk-cyan);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.fkai-chips button:hover:not(:disabled) {
+  background: rgba(0, 229, 255, 0.14);
+  border-color: var(--fk-cyan);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.fkai-chips button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Input Bar */
+.fkai-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  background: rgba(9, 12, 17, 0.98);
+  border-top: 1px solid var(--fk-border-subtle);
+}
+
+.fkai-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: 100px;
+  border: 1px solid var(--fk-border-subtle);
+  background: #06080b;
+  color: var(--fk-text);
+  font-family: inherit;
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fkai-form input:focus {
+  border-color: var(--fk-cyan);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
+}
+
+.fkai-form input::placeholder {
+  color: var(--fk-muted);
+  opacity: 0.7;
+}
+
+.fkai-send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--fk-cyan);
+  background: radial-gradient(circle at 40% 40%, #00e5ff 0%, #0099b8 100%);
+  color: #05080c;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+}
+
+.fkai-send-btn:hover:not(:disabled) {
+  transform: scale(1.06);
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.65);
+}
+
+.fkai-send-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Voice Typing Mic Button inside Chat Bar */
+.fkai-input-mic-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--fk-text);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.fkai-input-mic-btn:hover {
+  transform: scale(1.08);
+  border-color: var(--fk-cyan);
+  background: rgba(0, 229, 255, 0.12);
+}
+
+.fkai-input-mic-btn:active {
+  transform: scale(0.92);
+}
+
+.fkai-input-mic-btn.active {
+  background: rgba(0, 229, 130, 0.22);
+  border-color: rgba(0, 229, 130, 0.6);
+  box-shadow: 0 0 12px rgba(0, 229, 130, 0.55);
+  animation: fkai-mic-pulse 1.4s ease-out infinite;
+}
+
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS
+   ========================================================================== */
+
+@media (max-width: 480px) {
+  .fkai-fab {
+    right: 16px;
+    bottom: 16px;
+    width: 60px;
+    height: 60px;
+  }
+  .fkai-hint {
+    right: 16px;
+    bottom: 86px;
+    max-width: 220px;
+    font-size: 12px;
+  }
+  .fkai-panel {
+    right: 12px;
+    bottom: 84px;
+    width: calc(100vw - 24px);
+    height: calc(100vh - 100px);
+    max-height: 580px;
+    border-radius: 16px;
+  }
+}
+
+/* Prefers Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .fkai-radar-ring,
+  .fkai-dot,
+  .fkai-typing i,
+  .fkai-jet-trail {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   STREAMING BUBBLE — live token cursor
+   ========================================================================== */
+
+/* Blinking I-beam cursor while tokens stream in */
+@keyframes fkai-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.fkai-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--fk-cyan);
+  font-size: 0.85em;
+  animation: fkai-blink 0.75s step-start infinite;
+  vertical-align: middle;
+}
+
+/* Streaming bubble gets a subtle cyan left-border glow while updating */
+.fkai-bubble.fkai-streaming {
+  border-left: 2px solid var(--fk-cyan);
+  background: linear-gradient(135deg, #111c2a 0%, var(--fk-bubble-bot) 100%);
+}
+
+/* ==========================================================================
+   MIC BUTTON — interactive toggle (Click so OFF / ON)
+   ========================================================================== */
+
+.fkai-mic-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  font-size: 15px;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+}
+
+.fkai-mic-btn:hover {
+  transform: scale(1.1);
+}
+
+.fkai-mic-btn:active {
+  transform: scale(0.92);
+}
+
+/* Actively listening — emerald pulsing glow */
+.fkai-mic-btn.mic-listening {
+  background: rgba(0, 229, 130, 0.18);
+  border-color: rgba(0, 229, 130, 0.5);
+  box-shadow: 0 0 0 0 rgba(0, 229, 130, 0.55);
+  animation: fkai-mic-pulse 1.4s ease-out infinite;
+}
+
+/* Mic enabled and ready (idle) */
+.fkai-mic-btn.mic-ready {
+  background: rgba(0, 229, 130, 0.08);
+  border-color: rgba(0, 229, 130, 0.25);
+}
+
+/* Mic clicked so OFF — distinct red muted state */
+.fkai-mic-btn.mic-off {
+  background: rgba(255, 68, 68, 0.12);
+  border-color: rgba(255, 68, 68, 0.4);
+  color: #ff5252;
+}
+
+.fkai-mic-btn.mic-off:hover {
+  background: rgba(255, 68, 68, 0.22);
+  border-color: rgba(255, 68, 68, 0.7);
+  color: #ff6b6b;
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+}
+
+.fkai-mic-icon-off {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+/* Speaker / Voice Sound Toggle Button */
+.fkai-speaker-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--fk-text);
+}
+
+.fkai-speaker-btn:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--fk-cyan-dim);
+}
+
+.fkai-speaker-btn:active {
+  transform: scale(0.92);
+}
+
+.fkai-speaker-btn.sound-muted {
+  background: rgba(255, 68, 68, 0.12);
+  border-color: rgba(255, 68, 68, 0.35);
+  color: #ff5252;
+}
+
+.fkai-speaker-btn.sound-muted:hover {
+  background: rgba(255, 68, 68, 0.22);
+  border-color: rgba(255, 68, 68, 0.6);
+}
+
+
+@keyframes fkai-mic-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(0, 229, 130, 0.55); }
+  70%  { box-shadow: 0 0 0 8px rgba(0, 229, 130, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 229, 130, 0); }
+}
+
+
+/* ==========================================================================
+   MIC ERROR BANNER
+   ========================================================================== */
+
+.fkai-mic-error {
+  padding: 6px 14px;
+  font-size: 11px;
+  color: #ffa17a;
+  background: rgba(255, 80, 50, 0.08);
+  border-top: 1px solid rgba(255, 80, 50, 0.2);
+  text-align: center;
+  font-family: var(--font-space), sans-serif;
+}

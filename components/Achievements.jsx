@@ -31,12 +31,13 @@ const WINS = [
 ]
 
 import { useIsMobile } from '../hooks/useIsMobile'
+import HackathonTrophy from './HackathonTrophy'
 
 export default function Achievements() {
   const isMobile = useIsMobile()
 
   return (
-    <section id="achievements" style={{ padding: isMobile ? '80px 24px' : '140px 100px', background: '#0A0A0C', overflow: 'hidden' }}>
+    <section id="achievements" style={{ padding: isMobile ? '80px 24px' : '140px 100px', background: '#0A0A0C', position: 'relative', overflow: 'visible' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
         <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: isMobile ? '40px' : '80px' }}>
@@ -45,21 +46,8 @@ export default function Achievements() {
           <span style={{ fontFamily: 'var(--font-space)', fontSize: '11px', letterSpacing: '3px', color: '#C9A96E' }}>Hackathon Record</span>
         </div>
 
-        {/* Big callout */}
-        <div className="reveal" style={{ marginBottom: isMobile ? '60px' : '100px', textAlign: 'center' }}>
-          <div style={{
-            fontFamily: 'var(--font-space)',
-            fontSize: 'clamp(48px, 8vw, 120px)',
-            fontWeight: 700, letterSpacing: '-4px',
-            lineHeight: 0.9,
-          }}>
-            <span style={{ color: '#F0ECE3' }}>3</span>
-            <span style={{ color: '#C9A96E' }}> entered.</span><br />
-            <span style={{ color: '#F0ECE3' }}>3</span>
-            <span style={{ color: '#D4847A' }}> won.</span><br />
-            <span style={{ color: '#7A7572' }}>0 losses.</span>
-          </div>
-        </div>
+        {/* Big callout with dropping trophy sequence */}
+        <HackathonTrophy isMobile={isMobile} />
 
         {/* Timeline */}
         <div style={{ position: 'relative' }}>

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { speakDeep } from '../ai/voice'
 
 const SplineCharacter = dynamic(() => import('./SplineCharacter'), { ssr: false })
 
@@ -22,25 +23,25 @@ const LinkedinIcon = () => (
   </svg>
 )
 
-const TwitterIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+const LeetCodeIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/>
   </svg>
 )
 
-const InstagramIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+const CodolioIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="4" />
+    <path d="M8 12l2.5 2.5L16 9" />
+    <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" opacity="0.25" />
   </svg>
 )
 
 const SOCIALS = [
   { icon: <GithubIcon />, label: 'GitHub', href: 'https://github.com/FaizanKhan2910' },
   { icon: <LinkedinIcon />, label: 'LinkedIn', href: 'https://linkedin.com/in/faizan-khan-57092832a' },
-  { icon: <TwitterIcon />, label: 'Twitter', href: '#' },
-  { icon: <InstagramIcon />, label: 'Instagram', href: '#' },
+  { icon: <LeetCodeIcon />, label: 'LeetCode', href: 'https://leetcode.com/u/Faizan__Khan2910/' },
+  { icon: <CodolioIcon />, label: 'Codolio', href: 'https://codolio.com/profile/Faizankhan2910/' },
 ]
 
 const IDLE_DELAY_MS = 4000
@@ -223,17 +224,8 @@ export default function Hero() {
   const handleFirstClick = () => {
     if (!hasSpoken) {
       setHasSpoken(true);
-
-      // Cancel any stuck utterances
-      window.speechSynthesis.cancel();
-
-      const text = "Hi, I'm Faizzan's digital assistant. Faizan is a 2nd-year AIML student, a passionate software developer , 3-time hackathon winner,  He builds AI-powered products, full-stack applications, and innovative solutions designed to create real-world impact.";
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.2; // 1.5 is sometimes too fast for default voices and can cause them to fail
-      utterance.pitch = 1;
-
-      // Speak synchronously so the browser registers it as a direct user action
-      window.speechSynthesis.speak(utterance)
+      const text = "Hi, I'm Faizan's digital assistant. Faizan is a pre-final year CSE AI and ML student, a passionate software developer, and 3-time hackathon winner defeating 796+ students. He builds AI-powered products, full-stack applications, and innovative solutions designed to create real-world impact.";
+      speakDeep(text);
     }
   };
 

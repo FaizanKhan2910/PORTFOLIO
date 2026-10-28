@@ -1,5 +1,6 @@
 import { Inter, Space_Grotesk } from 'next/font/google'
 import './globals.css'
+import AIAssistant from '@/ai/AIAssistant'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -22,7 +23,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${space.variable}`}>
-      <body className="noise">{children}</body>
+      <body className="noise">
+        {children}
+        <AIAssistant />
+      </body>
     </html>
   )
 }

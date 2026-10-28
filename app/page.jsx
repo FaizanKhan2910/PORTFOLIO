@@ -11,6 +11,7 @@ import Achievements from '@/components/Achievements'
 import Stack from '@/components/Stack'
 import Contact from '@/components/Contact'
 import Footer from '@/components/Footer'
+import DsaCard from '@/components/DsaCard'
 
 export default function Home() {
   const [loaded, setLoaded] = useState(false)
@@ -44,6 +45,7 @@ export default function Home() {
         <Work />
         <Achievements />
         <Stack />
+        <DsaCard />
         <Contact />
         <Footer />
       </div>
