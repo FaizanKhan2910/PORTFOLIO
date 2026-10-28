@@ -32,6 +32,15 @@ He is a **Full-Stack Application Developer + AI Engineer** with hands-on industr
     short: "Faizan Khan is a pre-final year B.E. CSE (AI & ML) student at JSSATE Bengaluru, Full-Stack Application Developer + AI Engineer, with industry internship experience and an undefeated 3-0 Hackathon Champion record.",
   },
 
+  // ── PRONUNCIATION ──────────────────────────────────────────────────────────
+  {
+    id: "pronunciation",
+    title: "Name Pronunciation",
+    keywords: ["pronounce", "pronunciation", "how to pronounce", "say name", "say faizan", "fay-zahn", "fay-zaan", "how to say"],
+    text: `Faizan is pronounced **fay-zahn** (IPA: /feɪˈzɑːn/ or fay-ZAAN). The first syllable "fay" sounds like "day" or "say", and the second syllable "zahn" has an open vowel sound rhyming with "khan".`,
+    short: "Faizan is pronounced fay-zahn (IPA: /feɪˈzɑːn/ or fay-ZAAN).",
+  },
+
   // ── EDUCATION ─────────────────────────────────────────────────────────────
   {
     id: "education",

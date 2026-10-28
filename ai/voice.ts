@@ -97,12 +97,20 @@ class NaturalDeepMaleVoiceProvider implements VoiceProvider {
     window.speechSynthesis.cancel()
 
     // Clean text: strip markdown, URLs, symbols, and bullets
-    const cleanText = text
+    let cleanText = text
       .replace(/[*_#`~[\]]/g, "")
       .replace(/https?:\/\/\S+/g, "")
       .replace(/[✓✨⚡🏆🚀💻💼👋✦•⚠️]/g, "")
       .replace(/\s+/g, " ")
       .trim()
+
+    // Phonetic tuning for Faizan:
+    // Ensures speech synthesis engines pronounce the name accurately as "fay-zahn" / "fay-ZAAN" (IPA: /feɪˈzɑːn/)
+    // avoiding common browser TTS mispronunciations like "Fie-zan" or "Fah-ee-zan".
+    cleanText = cleanText
+      .replace(/\bFaizan['’]s\b/gi, "Fay-zahn's")
+      .replace(/\bFaizankhan\b/gi, "Fay-zahn Khan")
+      .replace(/\bFaizan\b/gi, "Fay-zahn")
 
     if (!cleanText) return
 
