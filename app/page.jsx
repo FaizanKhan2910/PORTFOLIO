@@ -40,7 +40,7 @@ export default function Home() {
         pointerEvents: loaded ? 'all' : 'none'
       }}>
         <Navbar />
-        <Hero />
+        <Hero isLoaded={loaded} />
         <About />
         <Work />
         <Achievements />
