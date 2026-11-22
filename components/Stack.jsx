@@ -14,7 +14,7 @@ export default function Stack() {
         maxWidth: '1400px',
         margin: '0 auto',
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'visible',
       }}
     >
       {/* Section Sub-heading */}

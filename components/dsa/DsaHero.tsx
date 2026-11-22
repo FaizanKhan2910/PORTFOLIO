@@ -13,7 +13,7 @@ export default function DsaHero({ onExploreClick }: DsaHeroProps) {
   const shouldReduceMotion = useReducedMotion()
   const [count, setCount] = useState(shouldReduceMotion ? DSA_CONFIG.totalSolved : 0)
 
-  // Animated Count-Up for 435+
+  // Animated Count-Up for 442+
   useEffect(() => {
     if (shouldReduceMotion) return
 

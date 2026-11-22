@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 // Codolio has no public JSON API - it's a CSR Next.js app.
 // fetchCodolioData returns null to trigger honest fallback.
 // Replace this function when/if Codolio exposes a real API.
-const MANUAL_COUNT = 435
+const MANUAL_COUNT = 442
 const CACHE_TTL_MS = 60 * 60 * 1000
 
 let cache: { total: number; source: string; updatedAt: number } | null = null

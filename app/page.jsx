@@ -13,6 +13,8 @@ import Contact from '@/components/Contact'
 import Footer from '@/components/Footer'
 import DsaCard from '@/components/DsaCard'
 
+const ParticlePortrait = dynamic(() => import('@/components/ParticlePortrait'), { ssr: false })
+
 export default function Home() {
   const [loaded, setLoaded] = useState(false)
 
@@ -40,6 +42,7 @@ export default function Home() {
         pointerEvents: loaded ? 'all' : 'none'
       }}>
         <Navbar />
+        <ParticlePortrait isLoaded={loaded} />
         <Hero isLoaded={loaded} />
         <About />
         <Work />

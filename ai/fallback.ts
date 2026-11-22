@@ -50,7 +50,7 @@ export function getFallbackAnswer(question: string): string {
 
   if (q === "why hire me?" || q === "why hire me" || q.includes("why hire")) {
     const entry = KNOWLEDGE_BASE.find((k) => k.id === "why_hire_me")
-    return entry ? entry.text : "Faizan combines real industry internship experience at Healthrytix, an undefeated 3-0 hackathon championship record, full-stack MERN & Next.js mastery, hands-on AI/ML deployment, and 400+ solved DSA problems."
+    return entry ? entry.text : "Faizan combines real industry internship experience at Healthrytix, an undefeated 3-0 hackathon championship record, full-stack MERN & Next.js mastery, hands-on AI/ML deployment, and 442+ solved DSA problems."
   }
 
   // Explicit check for unverified technologies like Redis

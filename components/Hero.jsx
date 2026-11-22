@@ -1,10 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import dynamic from 'next/dynamic'
 import { useIsMobile } from '../hooks/useIsMobile'
-
-// Dynamically load the particle portrait Three.js canvas (SSR disabled)
-const ParticlePortrait = dynamic(() => import('./ParticlePortrait'), { ssr: false })
+import CinematicParticles from './CinematicParticles'
 
 const ROLES = [
   'FULL-STACK DEVELOPER',
@@ -127,9 +124,11 @@ export default function Hero({ isLoaded = true }) {
   return (
     <section
       ref={wrapperRef}
+      id="hero-wrapper"
+      data-hero-cursor="true"
       style={{
         position: 'relative',
-        height: isMobile ? '240vh' : '290vh',
+        height: isMobile ? '180vh' : '220vh',
       }}
     >
       {/* Sticky 100vh Hero Viewport */}
@@ -144,12 +143,8 @@ export default function Hero({ isLoaded = true }) {
           overflow: 'hidden',
         }}
       >
-        {/* Full-Screen Interactive Three.js Dot Portrait */}
-        <ParticlePortrait
-          scrollProgress={scrollProgress}
-          isLoaded={isLoaded}
-        />
-
+        {/* Cinematic Organic Floating Gold Particles */}
+        <CinematicParticles section="hero" isMobile={isMobile} />
         {isMobile ? (
           // MOBILE LAYOUT
           <div
@@ -311,7 +306,7 @@ export default function Hero({ isLoaded = true }) {
 
             {/* Resume button */}
             <a
-              href="/Faizan_5.pdf"
+              href="/resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -520,7 +515,7 @@ export default function Hero({ isLoaded = true }) {
 
             {/* Resume button */}
             <a
-              href="/Faizan_5.pdf"
+              href="/resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
               style={{

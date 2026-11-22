@@ -22,7 +22,7 @@ He is a **Full-Stack Application Developer + AI Engineer** with hands-on industr
 
 🏆 **Achievements:**
 • 3× Hackathon Champion with an undefeated 3-0 record (796+ students defeated)
-• 400+ DSA problems solved on LeetCode & GeeksforGeeks
+• 442+ DSA problems solved on LeetCode & GeeksforGeeks
 
 📬 **Contact & Profiles:**
 • Phone: 6307672466
@@ -180,8 +180,8 @@ Total: 3 entered, 3 won, 0 losses, 796+ students defeated.`,
     id: "dsa",
     title: "DSA & Problem Solving",
     keywords: ["dsa", "leetcode", "geeksforgeeks", "gfg", "problem", "solving", "algorithms", "data structures", "competitive", "coding"],
-    text: `Faizan has solved 400+ DSA problems across LeetCode and GeeksforGeeks (as of 2026). He has strong algorithmic fundamentals in dynamic programming, graph theory, trees, and optimal data structure design.`,
-    short: "Faizan has solved 400+ DSA problems on LeetCode and GeeksforGeeks, with strong fundamentals in dynamic programming, graphs, and data structures.",
+    text: `Faizan has solved 442+ DSA problems across LeetCode and GeeksforGeeks (as of 2026). He has strong algorithmic fundamentals in dynamic programming, graph theory, trees, and optimal data structure design.`,
+    short: "Faizan has solved 442+ DSA problems on LeetCode and GeeksforGeeks, with strong fundamentals in dynamic programming, graphs, and data structures.",
   },
 
   // ── CONTACT ──────────────────────────────────────────────────────────────
@@ -207,9 +207,9 @@ Total: 3 entered, 3 won, 0 losses, 796+ students defeated.`,
 2. Proven Execution Under Pressure: 3× National & Inter-Collegiate Hackathon Champion — 3 entered, 3 won, 0 losses, defeating 796+ students.
 3. Full-Stack Depth: Proficient across the complete MERN stack, Next.js, FastAPI, PostgreSQL, Docker, Kubernetes, and CI/CD.
 4. Applied AI/ML: Hands-on with YOLOv8, Llama-3, Gemini 2.5 Flash, FastAPI AI backends, and voice AI workflows.
-5. Strong Fundamentals: 400+ DSA problems solved on LeetCode and GeeksforGeeks.
+5. Strong Fundamentals: 442+ DSA problems solved on LeetCode and GeeksforGeeks.
 6. Ships Production-Grade Code: All projects are live, deployed, and functional — not just tutorials.`,
-    short: "Faizan brings real industry internship experience (Healthrytix), a 3-0 hackathon record, full MERN/Next.js/FastAPI stack depth, applied AI/ML (YOLOv8, Gemini, Llama-3), 400+ DSA problems, and a track record of shipping production-grade applications.",
+    short: "Faizan brings real industry internship experience (Healthrytix), a 3-0 hackathon record, full MERN/Next.js/FastAPI stack depth, applied AI/ML (YOLOv8, Gemini, Llama-3), 442+ DSA problems, and a track record of shipping production-grade applications.",
   },
 ]
 

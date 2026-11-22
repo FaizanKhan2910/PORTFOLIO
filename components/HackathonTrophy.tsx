@@ -2,795 +2,799 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 
-interface DustParticle {
-  x: number
-  y: number
-  vx: number
-  vy: number
-  radius: number
-  life: number
-}
-
-interface SparkParticle {
-  x: number
-  y: number
-  radius: number
-  vx: number
-  vy: number
-  life: number
-  decay: number
-}
-
 interface HackathonTrophyProps {
   isMobile?: boolean
 }
 
 export default function HackathonTrophy({ isMobile = false }: HackathonTrophyProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const shakeWrapperRef = useRef<HTMLDivElement | null>(null)
-  const trophyRef = useRef<HTMLDivElement | null>(null)
-  const shockwaveRef = useRef<HTMLDivElement | null>(null)
+  const stageRef = useRef<HTMLDivElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const lineRefs = useRef<(HTMLDivElement | null)[]>([])
+  const hasTriggeredRef = useRef(false)
+  const isPlayingRef = useRef(false)
 
-  const rafIdRef = useRef<number | null>(null)
-  const dustParticlesRef = useRef<DustParticle[]>([])
-  const sparkParticlesRef = useRef<SparkParticle[]>([])
-  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([])
-  const activeAnimsRef = useRef<Animation[]>([])
-  const hasPlayedRef = useRef<boolean>(false)
-  const isPlayingRef = useRef<boolean>(false)
+  const [winsCount, setWinsCount] = useState(0)
+  const [lossesCount, setLossesCount] = useState(0)
+  const [competitorsCount, setCompetitorsCount] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isBusy, setIsBusy] = useState(false)
 
-  const [hasStarted, setHasStarted] = useState(false)
-  const [isReplaying, setIsReplaying] = useState(false)
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  const rafRef = useRef<number[]>([])
+  const particlesRafRef = useRef<number | null>(null)
 
-  // Clear all pending timers and animations
-  const cleanup = useCallback(() => {
-    timeoutsRef.current.forEach(clearTimeout)
-    timeoutsRef.current = []
+  // Particles & physics state
+  const dotsRef = useRef<any[]>([])
+  const sparksRef = useRef<any[]>([])
+  const ptrRef = useRef<{ x: number; y: number }>({ x: -999, y: -999 })
+  const dimsRef = useRef<{ w: number; h: number }>({ w: 420, h: 780 })
 
-    activeAnimsRef.current.forEach(anim => {
-      try {
-        anim.cancel()
-      } catch {
-        // ignore if already finished/cancelled
+  const clearAllTimers = useCallback(() => {
+    timersRef.current.forEach(clearTimeout)
+    rafRef.current.forEach(cancelAnimationFrame)
+    timersRef.current = []
+    rafRef.current = []
+  }, [])
+
+  const countUp = useCallback((setter: (val: number) => void, target: number, delayMs: number) => {
+    let t0: number | null = null
+    const timer = setTimeout(() => {
+      const step = (t: number) => {
+        if (t0 === null) t0 = t
+        const k = Math.min((t - t0) / 1100, 1)
+        const e = 1 - Math.pow(1 - k, 3)
+        setter(Math.round(target * e))
+        if (k < 1) {
+          rafRef.current.push(requestAnimationFrame(step))
+        }
       }
-    })
-    activeAnimsRef.current = []
+      rafRef.current.push(requestAnimationFrame(step))
+    }, delayMs)
+    timersRef.current.push(timer)
+  }, [])
 
-    if (rafIdRef.current !== null) {
-      cancelAnimationFrame(rafIdRef.current)
-      rafIdRef.current = null
-    }
-
-    dustParticlesRef.current = []
-    sparkParticlesRef.current = []
-
-    const canvas = canvasRef.current
-    if (canvas) {
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        ctx.save()
-        ctx.setTransform(1, 0, 0, 1, 0, 0)
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.restore()
-      }
+  const burst = useCallback((x: number, y: number, n: number) => {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2
+      const v = Math.random() * 3.2 + 0.8
+      sparksRef.current.push({
+        x,
+        y,
+        vx: Math.cos(a) * v,
+        vy: Math.sin(a) * v - 1.4,
+        r: Math.random() * 2 + 0.8,
+        l: 1,
+        d: Math.random() * 0.012 + 0.008,
+        w: Math.random() < 0.3,
+      })
     }
   }, [])
 
-  // Canvas resize and DPR scaling
-  const syncCanvasSize = useCallback(() => {
-    const canvas = canvasRef.current
-    const container = containerRef.current
-    if (!canvas || !container) return
+  const playSequence = useCallback(() => {
+    clearAllTimers()
+    setIsPlaying(false)
+    setIsBusy(true)
+    setWinsCount(0)
+    setLossesCount(0)
+    setCompetitorsCount(0)
 
-    const rect = container.getBoundingClientRect()
-    const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2)
-    canvas.width = Math.floor(rect.width * dpr)
-    canvas.height = Math.floor(rect.height * dpr)
-    canvas.style.width = `${rect.width}px`
-    canvas.style.height = `${rect.height}px`
+    // Force reflow
+    if (stageRef.current) {
+      void stageRef.current.offsetWidth
+    }
+
+    // Trigger animation
+    setTimeout(() => {
+      setIsPlaying(true)
+      isPlayingRef.current = true
+
+      const W = dimsRef.current.w
+      const H = dimsRef.current.h
+      const wide = W / 2
+
+      const at = (ms: number, fn: () => void) => {
+        timersRef.current.push(setTimeout(fn, ms))
+      }
+
+      // Exact choreographed particle burst timings
+      at(1550, () => burst(W * 0.2, H * 0.74 - 90, 28))
+      at(1650, () => burst(wide, H * 0.74 - 130, 46))
+      at(1750, () => burst(W * 0.8, H * 0.74 - 90, 28))
+      at(2300, () => burst(W * 0.3, 230, 22))
+      at(2650, () => burst(W * 0.7, 330, 22))
+      at(3000, () => burst(W * 0.3, 460, 22))
+      at(3300, () => burst(wide, H - 110, 60))
+
+      // Stats Count up
+      countUp(setWinsCount, 3, 3500)
+      countUp(setLossesCount, 0, 3500)
+      countUp(setCompetitorsCount, 796, 3500)
+
+      at(4800, () => {
+        setIsBusy(false)
+      })
+    }, 20)
+  }, [burst, clearAllTimers, countUp])
+
+  // Canvas setup and particle animation loop
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const stage = stageRef.current
+    if (!canvas || !stage) return
 
     const ctx = canvas.getContext('2d')
-    if (ctx) {
-      ctx.setTransform(1, 0, 0, 1, 0, 0)
-      ctx.scale(dpr, dpr)
-    }
-  }, [])
+    if (!ctx) return
 
-  // Particle update and render loop
-  const startParticleLoop = useCallback(() => {
-    if (rafIdRef.current !== null) {
-      cancelAnimationFrame(rafIdRef.current)
-    }
+    const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2)
 
-    const loop = () => {
-      const canvas = canvasRef.current
-      const container = containerRef.current
-      if (!canvas || !container) return
-
-      const ctx = canvas.getContext('2d')
-      if (!ctx) return
-
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
-
-      // Clear using raw pixel dimensions
-      ctx.save()
-      ctx.setTransform(1, 0, 0, 1, 0, 0)
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.restore()
-
-      let activeCount = 0
-
-      // Update and draw dust cloud:
-      // ~65 soft circles (rgba(176,158,128,~0.22))
-      // spread outward horizontally, drift up slightly, grow in radius (+0.35/frame),
-      // fade out (life -= .013/frame), velocity damping 0.95
-      const dust = dustParticlesRef.current
-      for (let i = 0; i < dust.length; i++) {
-        const p = dust[i]
-        if (p.life > 0) {
-          activeCount++
-          p.x += p.vx
-          p.y += p.vy
-          p.vx *= 0.95
-          p.vy *= 0.95
-          p.radius += 0.35
-          p.life -= 0.013
-
-          if (p.life > 0) {
-            ctx.beginPath()
-            ctx.arc(p.x, p.y, Math.max(0.1, p.radius), 0, Math.PI * 2)
-            ctx.fillStyle = `rgba(176, 158, 128, ${Math.max(0, 0.22 * p.life)})`
-            ctx.fill()
-          }
-        }
-      }
-
-      // Update and draw gold sparks:
-      // ~45 small bright dots (rgba(243,223,174)), radius 1 to 3.2,
-      // velocity random up to +-7 x and -3 to -12 y, gravity +0.4/frame, fade fast
-      const sparks = sparkParticlesRef.current
-      for (let i = 0; i < sparks.length; i++) {
-        const s = sparks[i]
-        if (s.life > 0) {
-          activeCount++
-          s.vy += 0.4 // gravity
-          s.x += s.vx
-          s.y += s.vy
-          s.life -= s.decay
-
-          if (s.life > 0) {
-            ctx.beginPath()
-            ctx.arc(s.x, s.y, Math.max(0.1, s.radius), 0, Math.PI * 2)
-            ctx.fillStyle = `rgba(243, 223, 174, ${Math.max(0, s.life)})`
-            ctx.shadowColor = 'rgba(243, 223, 174, 0.85)'
-            ctx.shadowBlur = 5
-            ctx.fill()
-            ctx.shadowBlur = 0
-          }
-        }
-      }
-
-      if (activeCount > 0) {
-        rafIdRef.current = requestAnimationFrame(loop)
-      } else {
-        rafIdRef.current = null
-      }
-    }
-
-    rafIdRef.current = requestAnimationFrame(loop)
-  }, [])
-
-  // Spawns dust and sparks at impact
-  const spawnParticles = useCallback(() => {
-    const container = containerRef.current
-    if (!container) return
-    const rect = container.getBoundingClientRect()
-    const impactX = rect.width / 2
-    const impactY = rect.height - 60 // 60px above bottom (on floor line)
-
-    // Mobile: reduce particle counts by ~40% under 640px width
-    const isSmall = rect.width < 640
-    const dustCount = isSmall ? Math.round(65 * 0.6) : 65
-    const sparkCount = isSmall ? Math.round(45 * 0.6) : 45
-
-    const dust: DustParticle[] = []
-    for (let i = 0; i < dustCount; i++) {
-      // Horizontal outward spread
-      const side = Math.random() < 0.5 ? -1 : 1
-      const speed = 2.0 + Math.random() * 7.5
-      dust.push({
-        x: impactX + (Math.random() - 0.5) * 24,
-        y: impactY - Math.random() * 4,
-        vx: side * speed + (Math.random() - 0.5) * 1.5,
-        vy: -0.4 - Math.random() * 1.8, // drift up slightly
-        radius: 6 + Math.random() * 7,
-        life: 1.0,
-      })
-    }
-    dustParticlesRef.current = dust
-
-    const sparks: SparkParticle[] = []
-    for (let i = 0; i < sparkCount; i++) {
-      sparks.push({
-        x: impactX + (Math.random() - 0.5) * 12,
-        y: impactY - Math.random() * 4,
-        radius: 1.0 + Math.random() * 2.2, // radius 1 to 3.2
-        vx: (Math.random() * 14) - 7, // +-7 x
-        vy: -(3 + Math.random() * 9), // -3 to -12 y
-        life: 1.0,
-        decay: 0.024 + Math.random() * 0.012, // fade fast
-      })
-    }
-    sparkParticlesRef.current = sparks
-
-    startParticleLoop()
-  }, [startParticleLoop])
-
-  // Primary animation orchestrator
-  const playSequence = useCallback(() => {
-    cleanup()
-    isPlayingRef.current = true
-    setHasStarted(true)
-    setIsReplaying(true)
-
-    const trophyEl = trophyRef.current
-    const shockwaveEl = shockwaveRef.current
-    const shakeWrapperEl = shakeWrapperRef.current
-    const containerEl = containerRef.current
-
-    if (!trophyEl || !containerEl) return
-
-    // Ensure canvas matches container dimensions before starting
-    syncCanvasSize()
-
-    // Check prefers-reduced-motion
-    const prefersReducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    if (prefersReducedMotion) {
-      trophyEl.style.transform = 'translate3d(-50%, 0px, 0px) scaleY(1)'
-      trophyEl.style.opacity = '1'
-
-      lineRefs.current.forEach(line => {
-        if (line) {
-          line.style.opacity = '1'
-          line.style.transform = 'translateY(0px) scale(1)'
-          line.style.filter = 'none'
-        }
-      })
-      isPlayingRef.current = false
-      setIsReplaying(false)
-      return
-    }
-
-    // Reset initial visual states
-    lineRefs.current.forEach(line => {
-      if (line) {
-        line.style.opacity = '0'
-        line.style.transform = 'translateY(34px) scale(0.92)'
-        line.style.filter = 'blur(10px)'
-      }
+    const mk = (any: boolean) => ({
+      x: Math.random() * dimsRef.current.w,
+      y: any ? Math.random() * dimsRef.current.h : dimsRef.current.h + 10,
+      r: Math.random() * 1.9 + 0.5,
+      vy: -(Math.random() * 0.28 + 0.06),
+      vx: (Math.random() - 0.5) * 0.12,
+      p: Math.random() * 6.28,
+      s: Math.random() * 0.03 + 0.01,
+      w: Math.random() < 0.2,
     })
 
-    if (shockwaveEl) {
-      shockwaveEl.style.opacity = '0'
-      shockwaveEl.style.transform = 'translate(-50%, 50%) scale(1, 1)'
+    const resize = () => {
+      const rect = stage.getBoundingClientRect()
+      const W = rect.width
+      const H = rect.height
+      dimsRef.current = { w: W, h: H }
+
+      canvas.width = W * dpr
+      canvas.height = H * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      const n = Math.round((W * H) / 5200)
+      const newDots = []
+      for (let i = 0; i < n; i++) newDots.push(mk(true))
+      dotsRef.current = newDots
     }
 
-    // 1. Calculate drop distance from strictly ABOVE the viewport
-    const containerRect = containerEl.getBoundingClientRect()
-    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 900
-    // Guarantee startY is far above the top of the browser window (strictly negative)
-    const startY = -Math.max(viewportHeight + 500, Math.abs(containerRect.bottom) + 400)
+    resize()
+    window.addEventListener('resize', resize)
 
-    trophyEl.style.transform = `translate3d(-50%, ${startY}px, 0px) rotateY(0deg)`
-    trophyEl.style.opacity = '1'
-    trophyEl.style.transformOrigin = 'bottom center'
+    const handlePointerMove = (e: PointerEvent) => {
+      const rect = stage.getBoundingClientRect()
+      ptrRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+    }
+    const handlePointerLeave = () => {
+      ptrRef.current = { x: -999, y: -999 }
+    }
 
-    // Drop animation: ~780ms, accelerating downwards like gravity, spinning 720deg
-    const dropAnim = trophyEl.animate(
-      [
-        { transform: `translate3d(-50%, ${startY}px, 0px) rotateY(0deg)` },
-        { transform: `translate3d(-50%, 0px, 0px) rotateY(720deg)` },
-      ],
-      {
-        duration: 780,
-        easing: 'cubic-bezier(0.6, 0, 1, 0.5)',
-        fill: 'forwards',
-      }
-    )
-    activeAnimsRef.current.push(dropAnim)
+    stage.addEventListener('pointermove', handlePointerMove)
+    stage.addEventListener('pointerleave', handlePointerLeave)
 
-    dropAnim.onfinish = () => {
-      // 3. Impact triggers:
-      // a) Section shakes: translate keyframes: -7,5 / 6,-4 / -3,2 / 0 over 380ms
-      if (shakeWrapperEl) {
-        const shakeAnim = shakeWrapperEl.animate(
-          [
-            { transform: 'translate(0px, 0px)' },
-            { transform: 'translate(-7px, 5px)', offset: 0.16 },
-            { transform: 'translate(6px, -4px)', offset: 0.45 },
-            { transform: 'translate(-3px, 2px)', offset: 0.74 },
-            { transform: 'translate(0px, 0px)', offset: 1.0 },
-          ],
-          {
-            duration: 380,
-            easing: 'ease-out',
-          }
-        )
-        activeAnimsRef.current.push(shakeAnim)
-      }
+    const frame = () => {
+      const W = dimsRef.current.w
+      const H = dimsRef.current.h
+      ctx.clearRect(0, 0, W, H)
 
-      // b) Trophy squash-bounce: scaleY .84 -> translateY(-20px) scaleY 1.04 -> settle, 480ms ease-out, transform-origin bottom center
-      const bounceAnim = trophyEl.animate(
-        [
-          { transform: 'translate3d(-50%, 0px, 0px) rotateY(720deg) scaleY(0.84) scaleX(1.12)' },
-          { transform: 'translate3d(-50%, -20px, 0px) rotateY(720deg) scaleY(1.04) scaleX(0.98)', offset: 0.44 },
-          { transform: 'translate3d(-50%, 0px, 0px) rotateY(720deg) scaleY(1.0) scaleX(1.0)', offset: 1.0 },
-        ],
-        {
-          duration: 480,
-          easing: 'ease-out',
-          fill: 'forwards',
+      const dots = dotsRef.current
+      const ptr = ptrRef.current
+
+      for (let i = 0; i < dots.length; i++) {
+        const d = dots[i]
+        d.x += d.vx + Math.sin(d.p) * 0.08
+        d.y += d.vy
+        d.p += d.s
+
+        const dx = d.x - ptr.x
+        const dy = d.y - ptr.y
+        const q = dx * dx + dy * dy
+        if (q < 9000) {
+          const f = (1 - q / 9000) * 1.6
+          const m = Math.sqrt(q) || 1
+          d.x += (dx / m) * f
+          d.y += (dy / m) * f
         }
-      )
-      activeAnimsRef.current.push(bounceAnim)
+        if (d.y < -10 || d.x < -10 || d.x > W + 10) {
+          dots[i] = mk(false)
+          continue
+        }
 
-      // c) Shockwave: 20px gold ring (2px border) scaling to x18 horizontally / x5 vertically, fading over 900ms
-      if (shockwaveEl) {
-        const shockAnim = shockwaveEl.animate(
-          [
-            { transform: 'translate(-50%, 50%) scale(1, 1)', opacity: 0.95 },
-            { transform: 'translate(-50%, 50%) scale(18, 5)', opacity: 0 },
-          ],
-          {
-            duration: 900,
-            easing: 'cubic-bezier(0.1, 0.4, 0.2, 1)',
-            fill: 'forwards',
-          }
-        )
-        activeAnimsRef.current.push(shockAnim)
+        const a = 0.25 + 0.55 * Math.abs(Math.sin(d.p * 1.6))
+        ctx.fillStyle = d.w ? `rgba(255,255,255,${a * 0.8})` : `rgba(246,200,100,${a})`
+        ctx.beginPath()
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2)
+        ctx.fill()
       }
 
-      // d) Dust cloud + Gold sparks on canvas
-      spawnParticles()
-
-      // 4. Staggered text reveals:
-      // 3 lines fade/slide/unblur in, staggered by 300ms starting 250ms after impact
-      // Each line: 0.7s, cubic-bezier(.2,.9,.2,1)
-      const animateLine = (index: number) => {
-        const lineEl = lineRefs.current[index]
-        if (!lineEl) return
-        const lineAnim = lineEl.animate(
-          [
-            { opacity: 0, transform: 'translateY(34px) scale(0.92)', filter: 'blur(10px)' },
-            { opacity: 1, transform: 'translateY(0px) scale(1)', filter: 'blur(0px)' },
-          ],
-          {
-            duration: 700,
-            easing: 'cubic-bezier(0.2, 0.9, 0.2, 1)',
-            fill: 'forwards',
+      // Faint interactive link threads near pointer
+      if (ptr.x > 0) {
+        ctx.lineWidth = 0.6
+        for (let i = 0; i < dots.length; i++) {
+          const p = dots[i]
+          const dx2 = p.x - ptr.x
+          const dy2 = p.y - ptr.y
+          if (dx2 * dx2 + dy2 * dy2 < 16000) {
+            ctx.strokeStyle = 'rgba(246,200,100,0.28)'
+            ctx.beginPath()
+            ctx.moveTo(p.x, p.y)
+            ctx.lineTo(ptr.x, ptr.y)
+            ctx.stroke()
           }
-        )
-        activeAnimsRef.current.push(lineAnim)
+        }
       }
 
-      const t1 = setTimeout(() => animateLine(0), 250)
-      const t2 = setTimeout(() => animateLine(1), 550)
-      const t3 = setTimeout(() => {
-        animateLine(2)
-        isPlayingRef.current = false
-        setIsReplaying(false)
-      }, 850)
+      // Spark explosion particles
+      const sparks = sparksRef.current
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i]
+        s.x += s.vx
+        s.y += s.vy
+        s.vy += 0.06
+        s.vx *= 0.985
+        s.l -= s.d * 2
+        if (s.l <= 0) {
+          sparks.splice(i, 1)
+          continue
+        }
+        ctx.fillStyle = s.w ? `rgba(255,255,255,${s.l})` : `rgba(246,200,100,${s.l})`
+        ctx.beginPath()
+        ctx.arc(s.x, s.y, s.r * s.l + 0.3, 0, Math.PI * 2)
+        ctx.fill()
+      }
 
-      timeoutsRef.current.push(t1, t2, t3)
+      particlesRafRef.current = requestAnimationFrame(frame)
     }
-  }, [cleanup, spawnParticles, syncCanvasSize])
 
-  // IntersectionObserver for scroll-into-view (threshold 0.5, play once)
+    particlesRafRef.current = requestAnimationFrame(frame)
+
+    return () => {
+      window.removeEventListener('resize', resize)
+      stage.removeEventListener('pointermove', handlePointerMove)
+      stage.removeEventListener('pointerleave', handlePointerLeave)
+      if (particlesRafRef.current !== null) {
+        cancelAnimationFrame(particlesRafRef.current)
+      }
+    }
+  }, [])
+
+  // Trigger on scroll intersection (once: true)
   useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
+    const stage = stageRef.current
+    if (!stage) return
 
     const observer = new IntersectionObserver(
-      entries => {
-        const entry = entries[0]
-        if (entry.isIntersecting && !hasPlayedRef.current) {
-          hasPlayedRef.current = true
-          observer.disconnect()
+      ([entry]) => {
+        if (entry.isIntersecting && !hasTriggeredRef.current) {
+          hasTriggeredRef.current = true
           playSequence()
+          observer.disconnect()
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.18 }
     )
 
-    observer.observe(el)
-
-    return () => {
-      observer.disconnect()
-      cleanup()
-    }
-  }, [playSequence, cleanup])
-
-  // ResizeObserver for canvas responsiveness
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-
-    const resizeObserver = new ResizeObserver(() => {
-      syncCanvasSize()
-    })
-
-    resizeObserver.observe(el)
-
-    return () => {
-      resizeObserver.disconnect()
-    }
-  }, [syncCanvasSize])
-
-  const handleReplayClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    playSequence()
-  }
+    observer.observe(stage)
+    return () => observer.disconnect()
+  }, [playSequence])
 
   return (
     <div
-      ref={containerRef}
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: isMobile ? '340px' : '440px',
-        marginBottom: isMobile ? '60px' : '100px',
-        perspective: '1000px',
-        transformStyle: 'preserve-3d',
-        userSelect: 'none',
+        display: 'flex',
+        justifyContent: 'center',
+        margin: '0 auto',
+        padding: isMobile ? '10px 0 30px' : '20px 0 40px',
       }}
     >
-      {/* Replay Button */}
-      <button
-        type="button"
-        onClick={handleReplayClick}
-        aria-label="Replay hackathon trophy animation"
-        style={{
-          position: 'absolute',
-          top: isMobile ? '-32px' : '-44px',
-          right: '0',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '7px',
-          padding: '6px 14px',
-          background: 'rgba(20, 20, 24, 0.6)',
-          border: '1px solid rgba(200, 169, 122, 0.25)',
-          borderRadius: '100px',
-          color: '#c8a97a',
-          fontFamily: 'var(--font-space)',
-          fontSize: '11px',
-          fontWeight: 600,
-          letterSpacing: '1.5px',
-          textTransform: 'uppercase',
-          cursor: 'pointer',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          transition: 'all 0.25s cubic-bezier(0.2, 0.9, 0.2, 1)',
-          zIndex: 20,
-          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.4)',
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&display=swap');
+
+        .hk-stage {
+          --gold: #e8b94f;
+          --gold-soft: #f6d98a;
+          --amber: #c98f3a;
+          --ink: #0c0c10;
+          --paper: #f4efe6;
+          --peach: #d9a07a;
+          position: relative;
+          width: min(100%, 420px);
+          height: 780px;
+          overflow: hidden;
+          background: radial-gradient(120% 70% at 50% 0%, #17120a 0%, #050403 60%, #000 100%);
+          isolation: isolate;
+          font-family: "Chakra Petch", var(--font-space), "Segoe UI", sans-serif;
+          user-select: none;
+          border-radius: 16px;
+          border: 1px solid rgba(232, 185, 79, 0.15);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(232, 185, 79, 0.05);
+        }
+
+        .hk-stage #fx {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 5;
+          pointer-events: none;
+        }
+
+        .hk-stage .cone {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          width: 300px;
+          height: 560px;
+          margin-left: -150px;
+          z-index: 0;
+          transform-origin: 50% 0;
+          clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+          background: linear-gradient(180deg, rgba(246, 217, 138, .34), rgba(232, 185, 79, .08) 70%, transparent);
+          opacity: 0;
+        }
+
+        .hk-stage .checker {
+          position: absolute;
+          inset: 60px 0 auto 0;
+          height: 430px;
+          z-index: 0;
+          opacity: 0;
+          background: conic-gradient(rgba(255,255,255,.05) 25%, transparent 0 50%, rgba(255,255,255,.05) 0 75%, transparent 0) 0 0/52px 52px;
+          -webkit-mask: radial-gradient(60% 55% at 60% 40%, #000, transparent);
+          mask: radial-gradient(60% 55% at 60% 40%, #000, transparent);
+        }
+
+        .hk-stage .glow {
+          position: absolute;
+          left: 50%;
+          bottom: 170px;
+          width: 360px;
+          height: 200px;
+          margin-left: -180px;
+          z-index: 0;
+          background: radial-gradient(closest-side, rgba(232, 185, 79, .28), transparent);
+          opacity: 0;
+        }
+
+        .hk-stage #replay {
+          position: absolute;
+          top: 34px;
+          right: 20px;
+          z-index: 8;
+          font: 700 13px/1 "Chakra Petch", sans-serif;
+          letter-spacing: .2em;
+          color: var(--gold);
+          background: rgba(12, 12, 16, .75);
+          border: 1.5px solid rgba(232, 185, 79, .6);
+          border-radius: 999px;
+          padding: 12px 22px;
+          cursor: pointer;
+          transition: background .2s, transform .2s, box-shadow .2s;
+          display: inline-flex;
+          align-items: center;
+        }
+        .hk-stage #replay:hover {
+          background: rgba(232, 185, 79, .18);
+          box-shadow: 0 0 16px rgba(232, 185, 79, 0.35);
+        }
+        .hk-stage #replay:active {
+          transform: scale(.95);
+        }
+        .hk-stage #replay span {
+          display: inline-block;
+          margin-right: 8px;
+        }
+        .hk-stage.busy #replay span {
+          animation: hk-spin .8s linear infinite;
+        }
+        @keyframes hk-spin {
+          to { transform: rotate(-360deg); }
+        }
+
+        /* podium structure */
+        .hk-stage .podium {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 170px;
+          height: 170px;
+          z-index: 2;
+        }
+        .hk-stage .pillar {
+          position: absolute;
+          bottom: 50px;
+          width: 130px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .hk-stage .pillar.l { left: 14px; --h: 100px; }
+        .hk-stage .pillar.c { left: 50%; margin-left: -83px; width: 166px; --h: 148px; }
+        .hk-stage .pillar.r { right: 14px; --h: 100px; }
+
+        .hk-stage .box {
+          width: 100%;
+          height: var(--h);
+          background: linear-gradient(180deg, #1a1a20, #0b0b0e);
+          border: 1.5px solid rgba(232, 185, 79, .55);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          transform-origin: 50% 100%;
+          opacity: 0;
+          box-shadow: 0 0 24px rgba(232, 185, 79, .08) inset;
+        }
+        .hk-stage .pillar.c .box {
+          border-color: var(--gold);
+          box-shadow: 0 0 28px rgba(232, 185, 79, .25), 0 0 24px rgba(232, 185, 79, .08) inset;
+        }
+        .hk-stage .rank {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 28px;
+          font-weight: 700;
+          color: var(--peach);
+        }
+        .hk-stage .pillar.c .rank {
+          font-size: 38px;
+          color: #fff;
+          text-shadow: 0 0 14px rgba(255, 255, 255, .7);
+        }
+        .hk-stage .rank i {
+          font-style: normal;
+          font-size: 20px;
+        }
+        .hk-stage .badge {
+          font: 700 12px/1 "Chakra Petch", sans-serif;
+          letter-spacing: .2em;
+          color: var(--gold);
+          border: 1.5px solid var(--gold);
+          border-radius: 6px;
+          padding: 7px 10px;
+          background: rgba(232, 185, 79, .08);
+          position: relative;
+          overflow: hidden;
+        }
+        .hk-stage .badge::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+          transform: translateX(-120%);
+        }
+        .hk-stage .trophy {
+          position: absolute;
+          bottom: calc(var(--h) - 2px);
+          left: 50%;
+          width: 88px;
+          margin-left: -44px;
+          opacity: 0;
+          transform-origin: 50% 100%;
+          filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .6));
+        }
+        .hk-stage .pillar.c .trophy {
+          width: 118px;
+          margin-left: -59px;
+        }
+        .hk-stage .trophy svg {
+          display: block;
+          width: 100%;
+          height: auto;
+        }
+        .hk-stage .base {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 62px;
+          border: 1.5px solid rgba(232, 185, 79, .6);
+          border-bottom: 0;
+          border-radius: 34px 34px 0 0;
+          background: linear-gradient(180deg, #1d1d23, #07070a);
+          opacity: 0;
+          transform-origin: 50% 100%;
+        }
+
+        /* floating cards */
+        .hk-stage .card {
+          position: absolute;
+          z-index: 4;
+          width: 262px;
+          padding: 18px 22px 16px;
+          border-radius: 20px;
+          background: linear-gradient(160deg, rgba(24, 24, 30, .96), rgba(10, 10, 13, .96));
+          border: 1.5px solid rgba(232, 185, 79, .55);
+          box-shadow: 0 14px 36px rgba(0, 0, 0, .65), 0 0 22px rgba(232, 185, 79, .1);
+          opacity: 0;
+          --r: 0deg;
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+        }
+        .hk-stage .card .tag {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font: 700 15px/1 "Chakra Petch", sans-serif;
+          letter-spacing: .14em;
+          color: var(--gold);
+          margin-bottom: 14px;
+        }
+        .hk-stage .card h3 {
+          margin: 0 0 8px;
+          font-size: 19px;
+          font-weight: 700;
+          letter-spacing: .02em;
+          color: #fff;
+          text-transform: uppercase;
+        }
+        .hk-stage .card p {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--peach);
+          letter-spacing: .04em;
+        }
+        .hk-stage .c1 { top: 118px; left: 22px; --r: -3deg; }
+        .hk-stage .c2 { top: 248px; right: 14px; --r: 3.5deg; width: 272px; }
+        .hk-stage .c3 { top: 378px; left: 20px; --r: -1.5deg; width: 258px; }
+
+        .hk-stage .title {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 92px;
+          margin: 0;
+          text-align: center;
+          z-index: 3;
+          font-size: 27px;
+          font-weight: 700;
+          letter-spacing: .3em;
+          color: var(--gold-soft);
+          opacity: 0;
+          text-shadow: 0 0 22px rgba(232, 185, 79, .55);
+        }
+        .hk-stage .stats {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 50px;
+          margin: 0;
+          text-align: center;
+          z-index: 3;
+          font-size: 14px;
+          font-weight: 700;
+          letter-spacing: .18em;
+          color: #d6d3cc;
+          opacity: 0;
+          white-space: nowrap;
+        }
+        .hk-stage .stats b {
+          color: var(--gold);
+          font-weight: 700;
+        }
+        .hk-stage .stats em {
+          font-style: normal;
+          color: var(--gold);
+          margin: 0 8px;
+        }
+
+        /* choreographed sequence */
+        .hk-stage.play .cone { animation: hk-cone 1.2s .1s ease-out forwards; }
+        .hk-stage.play .checker { animation: hk-fade 1.6s .2s ease forwards; }
+        .hk-stage.play .glow { animation: hk-fade 1.6s 1.2s ease forwards; }
+        .hk-stage.play .pillar.l .box { animation: hk-rise .7s .45s cubic-bezier(.2,.9,.3,1.1) forwards; }
+        .hk-stage.play .pillar.c .box { animation: hk-rise .8s .3s cubic-bezier(.2,.9,.3,1.1) forwards; }
+        .hk-stage.play .pillar.r .box { animation: hk-rise .7s .6s cubic-bezier(.2,.9,.3,1.1) forwards; }
+        .hk-stage.play .base { animation: hk-rise .8s 0s cubic-bezier(.2,.9,.3,1.05) forwards; }
+        .hk-stage.play .pillar.l .trophy { animation: hk-land .7s 1s cubic-bezier(.3,1.4,.5,1) forwards; }
+        .hk-stage.play .pillar.c .trophy { animation: hk-land .8s .9s cubic-bezier(.3,1.4,.5,1) forwards; }
+        .hk-stage.play .pillar.r .trophy { animation: hk-land .7s 1.1s cubic-bezier(.3,1.4,.5,1) forwards; }
+        .hk-stage.play .badge::after { animation: hk-sheen 1.2s 2.2s ease forwards; }
+        .hk-stage.play .c1 { animation: hk-drop .9s 1.5s cubic-bezier(.2,1.1,.4,1) forwards, hk-bob 5s 2.5s ease-in-out infinite alternate; }
+        .hk-stage.play .c2 { animation: hk-drop .9s 1.85s cubic-bezier(.2,1.1,.4,1) forwards, hk-bob 6s 2.8s ease-in-out infinite alternate-reverse; }
+        .hk-stage.play .c3 { animation: hk-drop .9s 2.2s cubic-bezier(.2,1.1,.4,1) forwards, hk-bob 5.5s 3.1s ease-in-out infinite alternate; }
+        .hk-stage.play .title { animation: hk-title 1.3s 2.9s cubic-bezier(.2,.8,.2,1) forwards; }
+        .hk-stage.play .stats { animation: hk-fade 1s 3.4s ease forwards; }
+
+        @keyframes hk-cone { from { opacity: 0; transform: scaleY(.2); } to { opacity: 1; transform: scaleY(1); } }
+        @keyframes hk-fade { to { opacity: 1; } }
+        @keyframes hk-rise { from { opacity: 0; transform: translateY(70px) scaleY(.6); } to { opacity: 1; transform: none; } }
+        @keyframes hk-land { 0% { opacity: 0; transform: translateY(-70px) scale(.5); } 100% { opacity: 1; transform: none; } }
+        @keyframes hk-sheen { to { transform: translateX(120%); } }
+        @keyframes hk-drop { 0% { opacity: 0; transform: translateY(-150px) rotate(calc(var(--r) * -3)) scale(.9); } 100% { opacity: 1; transform: translateY(0) rotate(var(--r)); } }
+        @keyframes hk-bob { from { transform: translateY(0) rotate(var(--r)); } to { transform: translateY(-8px) rotate(calc(var(--r) * .6)); } }
+        @keyframes hk-title { 0% { opacity: 0; letter-spacing: .7em; filter: blur(8px); } 100% { opacity: 1; letter-spacing: .3em; filter: none; } }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hk-stage.play *, .hk-stage.play { animation-duration: .01s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+        }
+        @media (max-width: 380px) {
+          .hk-stage .title { font-size: 22px; }
+          .hk-stage .stats { font-size: 11.5px; }
+          .hk-stage .card { width: 236px; }
+          .hk-stage .c2 { width: 246px; }
+          .hk-stage .c3 { width: 232px; }
+        }
+          `,
         }}
-        onMouseEnter={e => {
-          e.currentTarget.style.borderColor = '#c8a97a'
-          e.currentTarget.style.color = '#f1ede4'
-          e.currentTarget.style.boxShadow = '0 0 16px rgba(200, 169, 122, 0.35)'
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.borderColor = 'rgba(200, 169, 122, 0.25)'
-          e.currentTarget.style.color = '#c8a97a'
-          e.currentTarget.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.4)'
-        }}
+      />
+
+      <main
+        ref={stageRef}
+        id="stage"
+        className={`hk-stage ${isPlaying ? 'play' : ''} ${isBusy ? 'busy' : ''}`}
       >
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          style={{
-            transform: isReplaying ? 'rotate(-360deg)' : 'none',
-            transition: isReplaying ? 'transform 0.78s cubic-bezier(0.6, 0, 1, 0.5)' : 'none',
-          }}
+        <canvas ref={canvasRef} id="fx" aria-hidden="true" />
+        <div className="cone" />
+        <div className="checker" />
+        <div className="glow" />
+
+        <button
+          id="replay"
+          type="button"
+          onClick={playSequence}
+          aria-label="Replay Hackathon Champion sequence"
         >
-          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19" />
-        </svg>
-        <span>Replay</span>
-      </button>
+          <span>↺</span>REPLAY
+        </button>
 
-      {/* Shake container: shakes the entire scene on trophy impact */}
-      <div
-        ref={shakeWrapperRef}
-        style={{
-          position: 'relative',
-          width: '100%',
-          minHeight: isMobile ? '340px' : '440px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          paddingBottom: '180px', // Leaves dedicated room for the 108px trophy on the floor line
-        }}
-      >
-        {/* Three Reveal Lines */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            zIndex: 2,
-            marginTop: isMobile ? '12px' : '20px',
-          }}
-        >
-          {/* Line 1: 3 entered. */}
-          <div
-            ref={el => {
-              lineRefs.current[0] = el
-            }}
-            style={{
-              fontFamily: 'var(--font-space)',
-              fontSize: 'clamp(34px, 7vw, 72px)',
-              fontWeight: 700,
-              lineHeight: 1.05,
-              letterSpacing: '-0.03em',
-              textAlign: 'center',
-              opacity: hasStarted ? 0 : 0,
-              transform: 'translateY(34px) scale(0.92)',
-              filter: 'blur(10px)',
-              willChange: 'transform, opacity, filter',
-            }}
-          >
-            <span style={{ color: '#f1ede4' }}>3</span>
-            <span style={{ color: '#c8a97a' }}> entered.</span>
+        {/* 1st Place Cards */}
+        <article className="card c1">
+          <div className="tag"><span>🏆</span>1ST PLACE</div>
+          <h3>Hackatronics 2.0</h3>
+          <p>53+ Teams · 24h</p>
+        </article>
+
+        <article className="card c2">
+          <div className="tag"><span>🏆</span>1ST PLACE</div>
+          <h3>JSS Navotthana 2.0</h3>
+          <p>70+ Teams · 24h</p>
+        </article>
+
+        <article className="card c3">
+          <div className="tag"><span>🏆</span>1ST PLACE</div>
+          <h3>CodeForge 2K25</h3>
+          <p>53 Teams · 8h</p>
+        </article>
+
+        {/* Tiered Podium */}
+        <div className="podium">
+          {/* Left Pillar */}
+          <div className="pillar l">
+            <div className="trophy">
+              <svg viewBox="0 0 80 108" aria-hidden="true">
+                <defs>
+                  <linearGradient id="g_gold_l" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#fff1bd" />
+                    <stop offset=".5" stopColor="#e8b94f" />
+                    <stop offset="1" stopColor="#8a5a17" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M20 14H8c0 14 4 24 14 28M60 14h12c0 14-4 24-14 28"
+                  fill="none"
+                  stroke="url(#g_gold_l)"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M20 8h40v26c0 15-9 26-20 26S20 49 20 34z"
+                  fill="url(#g_gold_l)"
+                />
+                <path
+                  d="M31 20c0 11 3 18 9 21"
+                  fill="none"
+                  stroke="#fff"
+                  strokeOpacity=".55"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <rect x="35" y="58" width="10" height="22" fill="url(#g_gold_l)" />
+                <path d="M26 82h28l4 12H22z" fill="url(#g_gold_l)" />
+                <rect x="16" y="94" width="48" height="10" rx="2" fill="#2a2a31" />
+              </svg>
+            </div>
+            <div className="box">
+              <div className="rank"><i>🌿</i>1<i>🌿</i></div>
+            </div>
           </div>
 
-          {/* Line 2: 3 won. */}
-          <div
-            ref={el => {
-              lineRefs.current[1] = el
-            }}
-            style={{
-              fontFamily: 'var(--font-space)',
-              fontSize: 'clamp(34px, 7vw, 72px)',
-              fontWeight: 700,
-              lineHeight: 1.05,
-              letterSpacing: '-0.03em',
-              textAlign: 'center',
-              opacity: hasStarted ? 0 : 0,
-              transform: 'translateY(34px) scale(0.92)',
-              filter: 'blur(10px)',
-              willChange: 'transform, opacity, filter',
-            }}
-          >
-            <span style={{ color: '#f1ede4' }}>3</span>
-            <span style={{ color: '#c98b7e' }}> won.</span>
+          {/* Center Champion Pillar */}
+          <div className="pillar c">
+            <div className="trophy">
+              <svg viewBox="0 0 80 108" aria-hidden="true">
+                <defs>
+                  <linearGradient id="g_gold_c" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#fff1bd" />
+                    <stop offset=".5" stopColor="#e8b94f" />
+                    <stop offset="1" stopColor="#8a5a17" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M20 14H8c0 14 4 24 14 28M60 14h12c0 14-4 24-14 28"
+                  fill="none"
+                  stroke="url(#g_gold_c)"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M20 8h40v26c0 15-9 26-20 26S20 49 20 34z"
+                  fill="url(#g_gold_c)"
+                />
+                <path
+                  d="M31 20c0 11 3 18 9 21"
+                  fill="none"
+                  stroke="#fff"
+                  strokeOpacity=".55"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <rect x="35" y="58" width="10" height="22" fill="url(#g_gold_c)" />
+                <path d="M26 82h28l4 12H22z" fill="url(#g_gold_c)" />
+                <rect x="16" y="94" width="48" height="10" rx="2" fill="#2a2a31" />
+              </svg>
+            </div>
+            <div className="box">
+              <div className="badge">👑 CHAMPION</div>
+              <div className="rank"><i>🌿</i>1<i>🌿</i></div>
+            </div>
           </div>
 
-          {/* Line 3: 0 losses. */}
-          <div
-            ref={el => {
-              lineRefs.current[2] = el
-            }}
-            style={{
-              fontFamily: 'var(--font-space)',
-              fontSize: 'clamp(34px, 7vw, 72px)',
-              fontWeight: 700,
-              lineHeight: 1.05,
-              letterSpacing: '-0.03em',
-              textAlign: 'center',
-              opacity: hasStarted ? 0 : 0,
-              transform: 'translateY(34px) scale(0.92)',
-              filter: 'blur(10px)',
-              willChange: 'transform, opacity, filter',
-            }}
-          >
-            <span style={{ color: '#f1ede4' }}>0</span>
-            <span style={{ color: '#77716b' }}> losses.</span>
+          {/* Right Pillar */}
+          <div className="pillar r">
+            <div className="trophy">
+              <svg viewBox="0 0 80 108" aria-hidden="true">
+                <defs>
+                  <linearGradient id="g_gold_r" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#fff1bd" />
+                    <stop offset=".5" stopColor="#e8b94f" />
+                    <stop offset="1" stopColor="#8a5a17" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M20 14H8c0 14 4 24 14 28M60 14h12c0 14-4 24-14 28"
+                  fill="none"
+                  stroke="url(#g_gold_r)"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M20 8h40v26c0 15-9 26-20 26S20 49 20 34z"
+                  fill="url(#g_gold_r)"
+                />
+                <path
+                  d="M31 20c0 11 3 18 9 21"
+                  fill="none"
+                  stroke="#fff"
+                  strokeOpacity=".55"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <rect x="35" y="58" width="10" height="22" fill="url(#g_gold_r)" />
+                <path d="M26 82h28l4 12H22z" fill="url(#g_gold_r)" />
+                <rect x="16" y="94" width="48" height="10" rx="2" fill="#2a2a31" />
+              </svg>
+            </div>
+            <div className="box">
+              <div className="rank"><i>🌿</i>1<i>🌿</i></div>
+            </div>
           </div>
+
+          <div className="base" />
         </div>
 
-        {/* Floor Line: 1px gold gradient line with soft glow, ~60px above section bottom */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '60px',
-            left: 0,
-            right: 0,
-            height: '1px',
-            background:
-              'linear-gradient(90deg, transparent 0%, rgba(200, 169, 122, 0.15) 15%, #c8a97a 50%, rgba(200, 169, 122, 0.15) 85%, transparent 100%)',
-            boxShadow:
-              '0 0 16px rgba(200, 169, 122, 0.45), 0 0 4px rgba(200, 169, 122, 0.7)',
-            pointerEvents: 'none',
-            zIndex: 1,
-          }}
-        />
-
-        {/* Soft Ambient Floor Glow beneath impact */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '54px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '180px',
-            height: '18px',
-            background:
-              'radial-gradient(ellipse at center, rgba(200, 169, 122, 0.35) 0%, rgba(200, 169, 122, 0.08) 50%, transparent 80%)',
-            filter: 'blur(5px)',
-            pointerEvents: 'none',
-            zIndex: 1,
-          }}
-        />
-
-        {/* Shockwave: 20px gold ring (2px border) at the impact point that scales to x18 horizontally / x5 vertically */}
-        <div
-          ref={shockwaveRef}
-          style={{
-            position: 'absolute',
-            bottom: '60px',
-            left: '50%',
-            width: '20px',
-            height: '20px',
-            borderRadius: '50%',
-            border: '2px solid rgba(243, 223, 174, 0.95)',
-            boxShadow:
-              '0 0 14px rgba(200, 169, 122, 0.75), inset 0 0 8px rgba(200, 169, 122, 0.5)',
-            transform: 'translate(-50%, 50%) scale(1, 1)',
-            opacity: 0,
-            pointerEvents: 'none',
-            zIndex: 3,
-            willChange: 'transform, opacity',
-          }}
-        />
-
-        {/* Trophy (90x108px): drops from above viewport, spins 720deg, squash-bounces on impact */}
-        <div
-          ref={trophyRef}
-          style={{
-            position: 'absolute',
-            bottom: '60px', // rests squarely on the 60px floor line
-            left: '50%',
-            width: '90px',
-            height: '108px',
-            transform: 'translate3d(-50%, -1000px, 0px)', // initial offscreen position
-            opacity: 0,
-            transformOrigin: 'bottom center',
-            zIndex: 4,
-            pointerEvents: 'none',
-            willChange: 'transform, opacity',
-          }}
-        >
-          <svg
-            viewBox="0 0 100 120"
-            width={90}
-            height={108}
-            style={{
-              overflow: 'visible',
-              display: 'block',
-              filter: 'drop-shadow(0 6px 20px rgba(200, 169, 122, 0.35))',
-            }}
-          >
-            <defs>
-              <linearGradient id="trophyGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#8f6f3d" />
-                <stop offset="50%" stopColor="#f3dfae" />
-                <stop offset="100%" stopColor="#a98245" />
-              </linearGradient>
-            </defs>
-
-            {/* Left handle: 6px stroke */}
-            <path
-              d="M25 18H10C10 40 20 46 30 48"
-              fill="none"
-              stroke="url(#trophyGoldGrad)"
-              strokeWidth="6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-
-            {/* Right handle: 6px stroke (mirror) */}
-            <path
-              d="M75 18H90C90 40 80 46 70 48"
-              fill="none"
-              stroke="url(#trophyGoldGrad)"
-              strokeWidth="6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-
-            {/* Stem rect */}
-            <rect
-              x="45"
-              y="70"
-              width="10"
-              height="22"
-              rx="1"
-              fill="url(#trophyGoldGrad)"
-            />
-
-            {/* Cup path: M25 8H75V40C75 62 62 72 50 72C38 72 25 62 25 40Z */}
-            <path
-              d="M25 8H75V40C75 62 62 72 50 72C38 72 25 62 25 40Z"
-              fill="url(#trophyGoldGrad)"
-            />
-
-            {/* Subtle cup lip specular highlight */}
-            <ellipse
-              cx="50"
-              cy="8"
-              rx="25"
-              ry="2.5"
-              fill="#f3dfae"
-              opacity="0.65"
-            />
-
-            {/* Small white star on the cup */}
-            <polygon
-              points="50,28 52.2,34.5 58,35.1 53.7,39 55,44.8 50,41.8 45,44.8 46.3,39 42,35.1 47.8,34.5"
-              fill="#ffffff"
-              opacity="0.95"
-              style={{ filter: 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.8))' }}
-            />
-
-            {/* Base rect */}
-            <rect
-              x="28"
-              y="92"
-              width="44"
-              height="10"
-              rx="2"
-              fill="url(#trophyGoldGrad)"
-            />
-
-            {/* Darker plinth (#6d5230) */}
-            <rect
-              x="20"
-              y="102"
-              width="60"
-              height="14"
-              rx="3"
-              fill="#6d5230"
-            />
-            {/* Plinth top edge subtle highlight */}
-            <line
-              x1="22"
-              y1="102"
-              x2="78"
-              y2="102"
-              stroke="#8f6f3d"
-              strokeWidth="1.5"
-              opacity="0.75"
-            />
-          </svg>
-        </div>
-
-        {/* Canvas Overlay for Dust Cloud and Gold Sparks */}
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'none',
-            zIndex: 10,
-          }}
-        />
-      </div>
+        {/* Title & Animated Counters */}
+        <h2 className="title">3× HACKATHON CHAMPION</h2>
+        <p className="stats">
+          <b>{winsCount}</b> WINS
+          <em>•</em>
+          <b>{lossesCount}</b> LOSSES
+          <em>•</em>
+          <span><b>{competitorsCount}</b>+ COMPETITORS</span>
+        </p>
+      </main>
     </div>
   )
 }

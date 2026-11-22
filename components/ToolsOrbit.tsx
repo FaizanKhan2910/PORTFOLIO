@@ -3,77 +3,74 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 
-export type ToolCategory = 'Languages' | 'Frontend' | 'Backend' | 'Databases' | 'DevOps'
+export type ToolCategory =
+  | 'Languages'
+  | 'Frontend'
+  | 'Backend & APIs'
+  | 'Databases'
+  | 'AI/ML & LLM'
+  | 'Cloud & DevOps'
+  | 'Dev Tools & Geo'
 
 interface ToolChip {
   id: string
   name: string
   category: ToolCategory
   ring: 'inner' | 'middle' | 'outer'
-  angle: number // in degrees
+  angle: number // degrees
 }
 
-interface AdditionalToolsByCategory {
-  [key: string]: string[]
+export const ALL_SKILLS_DATA: Record<ToolCategory, string[]> = {
+  'Languages': ['Java', 'JavaScript (ES6+)', 'TypeScript', 'Python', 'SQL'],
+  'Frontend': ['React', 'Next.js', 'Vite', 'Redux Toolkit', 'Tailwind CSS', 'Bootstrap', 'HTML5', 'CSS3', 'Framer Motion'],
+  'Backend & APIs': ['Node.js', 'Express.js', 'FastAPI', 'REST APIs', 'WebSockets', 'JWT', 'Passport.js', 'Bcrypt', 'Joi', 'Prisma ORM'],
+  'Databases': ['MongoDB', 'MongoDB Atlas', 'PostgreSQL', 'Supabase', 'Qdrant'],
+  'AI/ML & LLM': ['YOLOv8', 'Computer Vision', 'Image Processing', 'Object Detection', 'Llama 3', 'Gemini API', 'Groq API', 'LLM Integration', 'Prompt Engineering', 'Embeddings', 'RAG', 'Vector Search'],
+  'Cloud & DevOps': ['Docker', 'Kubernetes', 'Git', 'GitHub', 'GitHub Actions', 'CI/CD', 'Vercel', 'Render'],
+  'Dev Tools & Geo': ['Postman', 'Jest', 'Cloudinary', 'ImageKit', 'Stripe', 'Leaflet', 'MapLibre GL', 'Turf.js', 'GeoJSON', 'NDVI'],
 }
 
-const ALL_CATEGORIES: ToolCategory[] = [
+export const ALL_CATEGORIES: ToolCategory[] = [
   'Languages',
   'Frontend',
-  'Backend',
+  'Backend & APIs',
   'Databases',
-  'DevOps',
+  'AI/ML & LLM',
+  'Cloud & DevOps',
+  'Dev Tools & Geo',
 ]
 
-// 20 Orbit Chips Distributed across 3 rings
+// 24 Core Skills actively orbiting on the 3 concentric rings
 const ORBIT_CHIPS: ToolChip[] = [
-  // Inner ring (4 chips, radius 17%)
-  { id: 'react19', name: 'React 19', category: 'Frontend', ring: 'inner', angle: 0 },
-  { id: 'nextjs', name: 'Next.js', category: 'Frontend', ring: 'inner', angle: 90 },
-  { id: 'typescript', name: 'TypeScript', category: 'Languages', ring: 'inner', angle: 180 },
-  { id: 'python', name: 'Python', category: 'Languages', ring: 'inner', angle: 270 },
+  // ── Inner Ring (5 chips, radius 22%) ──────────────────────────────────────
+  { id: 'react', name: 'React', category: 'Frontend', ring: 'inner', angle: 0 },
+  { id: 'nextjs', name: 'Next.js', category: 'Frontend', ring: 'inner', angle: 72 },
+  { id: 'typescript', name: 'TypeScript', category: 'Languages', ring: 'inner', angle: 144 },
+  { id: 'python', name: 'Python', category: 'Languages', ring: 'inner', angle: 216 },
+  { id: 'nodejs', name: 'Node.js', category: 'Backend & APIs', ring: 'inner', angle: 288 },
 
-  // Middle ring (7 chips, radius 30%)
-  { id: 'nodejs', name: 'Node.js', category: 'Backend', ring: 'middle', angle: 0 },
-  { id: 'fastapi', name: 'FastAPI', category: 'Backend', ring: 'middle', angle: 51.4 },
-  { id: 'mongodb', name: 'MongoDB', category: 'Databases', ring: 'middle', angle: 102.8 },
-  { id: 'postgresql', name: 'PostgreSQL', category: 'Databases', ring: 'middle', angle: 154.3 },
-  { id: 'docker', name: 'Docker', category: 'DevOps', ring: 'middle', angle: 205.7 },
-  { id: 'kubernetes', name: 'Kubernetes', category: 'DevOps', ring: 'middle', angle: 257.1 },
-  { id: 'tailwind', name: 'Tailwind', category: 'Frontend', ring: 'middle', angle: 308.6 },
+  // ── Middle Ring (8 chips, radius 33%) ─────────────────────────────────────
+  { id: 'fastapi', name: 'FastAPI', category: 'Backend & APIs', ring: 'middle', angle: 0 },
+  { id: 'yolov8', name: 'YOLOv8', category: 'AI/ML & LLM', ring: 'middle', angle: 45 },
+  { id: 'mongodb', name: 'MongoDB', category: 'Databases', ring: 'middle', angle: 90 },
+  { id: 'docker', name: 'Docker', category: 'Cloud & DevOps', ring: 'middle', angle: 135 },
+  { id: 'postgresql', name: 'PostgreSQL', category: 'Databases', ring: 'middle', angle: 180 },
+  { id: 'llama3', name: 'Llama 3', category: 'AI/ML & LLM', ring: 'middle', angle: 225 },
+  { id: 'tailwind', name: 'Tailwind CSS', category: 'Frontend', ring: 'middle', angle: 270 },
+  { id: 'gemini', name: 'Gemini API', category: 'AI/ML & LLM', ring: 'middle', angle: 315 },
 
-  // Outer ring (9 chips, radius 43%)
-  { id: 'framer', name: 'Framer Motion', category: 'Frontend', ring: 'outer', angle: 0 },
-  { id: 'websockets', name: 'WebSockets', category: 'Backend', ring: 'outer', angle: 40 },
-  { id: 'supabase', name: 'Supabase', category: 'Databases', ring: 'outer', angle: 80 },
-  { id: 'java', name: 'Java', category: 'Languages', ring: 'outer', angle: 120 },
-  { id: 'git', name: 'Git', category: 'DevOps', ring: 'outer', angle: 160 },
-  { id: 'cicd', name: 'CI/CD', category: 'DevOps', ring: 'outer', angle: 200 },
-  { id: 'express', name: 'Express', category: 'Backend', ring: 'outer', angle: 240 },
-  { id: 'javascript', name: 'JavaScript', category: 'Languages', ring: 'outer', angle: 280 },
-  { id: 'redux', name: 'Redux Toolkit', category: 'Frontend', ring: 'outer', angle: 320 },
-]
-
-// All original tools that don't fit on the 20 orbit chips
-const ADDITIONAL_TOOLS: AdditionalToolsByCategory = {
-  Languages: [],
-  Frontend: ['HTML5', 'CSS3', 'Vite', 'Material UI', 'Bootstrap'],
-  Backend: ['REST APIs', 'JWT Auth', 'Bcrypt', 'Postman', 'Jest'],
-  Databases: ['MongoDB Atlas'],
-  DevOps: ['GitHub Actions', 'Render'],
-}
-
-const ALL_ADDITIONAL_SUMMARY = [
-  'HTML5',
-  'CSS3',
-  'Vite',
-  'REST APIs',
-  'MongoDB Atlas',
-  'GitHub Actions',
-  'Render',
-  'Postman',
-  'Jest',
-  'JWT Auth',
+  // ── Outer Ring (11 chips, radius 44%) ────────────────────────────────────
+  { id: 'java', name: 'Java', category: 'Languages', ring: 'outer', angle: 0 },
+  { id: 'kubernetes', name: 'Kubernetes', category: 'Cloud & DevOps', ring: 'outer', angle: 32.7 },
+  { id: 'rag', name: 'RAG', category: 'AI/ML & LLM', ring: 'outer', angle: 65.4 },
+  { id: 'qdrant', name: 'Qdrant', category: 'Databases', ring: 'outer', angle: 98.1 },
+  { id: 'websockets', name: 'WebSockets', category: 'Backend & APIs', ring: 'outer', angle: 130.8 },
+  { id: 'supabase', name: 'Supabase', category: 'Databases', ring: 'outer', angle: 163.5 },
+  { id: 'framer', name: 'Framer Motion', category: 'Frontend', ring: 'outer', angle: 196.2 },
+  { id: 'git', name: 'Git & GitHub', category: 'Cloud & DevOps', ring: 'outer', angle: 228.9 },
+  { id: 'express', name: 'Express.js', category: 'Backend & APIs', ring: 'outer', angle: 261.6 },
+  { id: 'vector', name: 'Vector Search', category: 'AI/ML & LLM', ring: 'outer', angle: 294.3 },
+  { id: 'maplibre', name: 'MapLibre GL', category: 'Dev Tools & Geo', ring: 'outer', angle: 327 },
 ]
 
 interface ToolsOrbitProps {
@@ -84,6 +81,11 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
   const [activeCategory, setActiveCategory] = useState<ToolCategory | null>(null)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const stageRef = useRef<HTMLDivElement | null>(null)
+
+  // Total count of verified skills across all categories (59)
+  const totalSkillsCount = useMemo(() => {
+    return Object.values(ALL_SKILLS_DATA).reduce((acc, list) => acc + list.length, 0)
+  }, [])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -99,8 +101,8 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
   const springConfig = { damping: 24, stiffness: 140 }
-  const tiltX = useSpring(useTransform(mouseY, [-0.5, 0.5], [6, -6]), springConfig)
-  const tiltY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-6, 6]), springConfig)
+  const tiltX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), springConfig)
+  const tiltY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), springConfig)
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (prefersReducedMotion || isMobile) return
@@ -122,17 +124,32 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
     setActiveCategory(prev => (prev === category ? null : category))
   }
 
-  // Displayed additional tools under the pills
-  const displayedAdditionalTools = useMemo(() => {
+  // Displayed tools under the filter pills
+  const displayedCategorySkills = useMemo(() => {
     if (activeCategory) {
-      return ADDITIONAL_TOOLS[activeCategory] || []
+      return ALL_SKILLS_DATA[activeCategory] || []
     }
-    return ALL_ADDITIONAL_SUMMARY
+    return [
+      'Java', 'TypeScript', 'Python', 'React', 'Next.js', 'FastAPI', 'Node.js',
+      'YOLOv8', 'Llama 3', 'RAG', 'Vector Search', 'MongoDB', 'PostgreSQL',
+      'Docker', 'Kubernetes', 'CI/CD', 'Leaflet', 'GeoJSON', 'Stripe'
+    ]
   }, [activeCategory])
 
   return (
-    <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
-      {/* Aurora Background (3 drifting blurred blobs) */}
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'visible',
+        padding: isMobile ? '10px 0 30px' : '20px 0 50px',
+      }}
+    >
+      {/* ── Aurora Background Ambient Blobs ───────────────────────────────── */}
       <div
         aria-hidden="true"
         style={{
@@ -143,57 +160,37 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
           zIndex: 0,
         }}
       >
-        {/* Blob 1: Gold */}
         <div
           className="aurora-blob-1"
           style={{
             position: 'absolute',
             top: '15%',
-            left: '5%',
-            width: isMobile ? '300px' : '440px',
-            height: isMobile ? '300px' : '440px',
+            left: '10%',
+            width: isMobile ? '260px' : '420px',
+            height: isMobile ? '260px' : '420px',
             borderRadius: '50%',
-            background:
-              'radial-gradient(circle, rgba(200, 169, 122, 0.14) 0%, rgba(200, 169, 122, 0) 70%)',
+            background: 'radial-gradient(circle, rgba(245, 185, 66, 0.12) 0%, transparent 70%)',
             filter: 'blur(75px)',
-            opacity: 0.85,
+            opacity: 0.8,
           }}
         />
-        {/* Blob 2: Rose */}
         <div
           className="aurora-blob-2"
           style={{
             position: 'absolute',
-            bottom: '10%',
-            right: '5%',
-            width: isMobile ? '320px' : '480px',
-            height: isMobile ? '320px' : '480px',
+            bottom: '15%',
+            right: '10%',
+            width: isMobile ? '280px' : '440px',
+            height: isMobile ? '280px' : '440px',
             borderRadius: '50%',
-            background:
-              'radial-gradient(circle, rgba(201, 139, 126, 0.13) 0%, rgba(201, 139, 126, 0) 70%)',
+            background: 'radial-gradient(circle, rgba(229, 169, 123, 0.12) 0%, transparent 70%)',
             filter: 'blur(80px)',
-            opacity: 0.8,
-          }}
-        />
-        {/* Blob 3: Faint Violet */}
-        <div
-          className="aurora-blob-3"
-          style={{
-            position: 'absolute',
-            top: '45%',
-            left: '40%',
-            width: isMobile ? '280px' : '400px',
-            height: isMobile ? '280px' : '400px',
-            borderRadius: '50%',
-            background:
-              'radial-gradient(circle, rgba(90, 75, 209, 0.11) 0%, rgba(90, 75, 209, 0) 70%)',
-            filter: 'blur(85px)',
             opacity: 0.75,
           }}
         />
       </div>
 
-      {/* Main Orbit Stage Container */}
+      {/* ── Main Orbit Stage Container (Centered Horizontally) ────────────── */}
       <div
         ref={stageRef}
         onMouseMove={handleMouseMove}
@@ -205,10 +202,11 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          justifyContent: 'center',
           perspective: 1200,
         }}
       >
-        {/* Tilting Stage Canvas */}
+        {/* ── Tilting Stage Canvas (Symmetrical Width & Height) ─────────────── */}
         <motion.div
           className="orbit-stage"
           style={{
@@ -216,106 +214,121 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
             rotateY: prefersReducedMotion ? 0 : tiltY,
             transformStyle: 'preserve-3d',
             position: 'relative',
-            width: isMobile ? 'min(88vw, 440px)' : '540px',
-            height: isMobile ? 'min(88vw, 440px)' : '540px',
-            maxWidth: '100%',
+            width: isMobile ? 'min(90vw, 420px)' : '520px',
+            height: isMobile ? 'min(90vw, 420px)' : '520px',
             margin: '0 auto',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          {/* Faint Dashed Rings */}
-          {/* Inner Ring (radius 17% -> diameter 34%) */}
+          {/* ── Concentric Dashed Orbit Rings ───────────────────────────────── */}
+          {/* Inner Ring: diameter 48% (radius 24%) */}
           <div
             className="orbit-faint-ring"
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
-              width: '34%',
-              height: '34%',
+              width: '48%',
+              height: '48%',
               transform: 'translate(-50%, -50%)',
               borderRadius: '50%',
-              border: '1px dashed rgba(45, 45, 55, 0.9)',
+              border: '1px dashed rgba(70, 70, 85, 0.85)',
               pointerEvents: 'none',
-              boxShadow: '0 0 20px rgba(200, 169, 122, 0.03)',
+              boxShadow: '0 0 20px rgba(245, 185, 66, 0.04)',
             }}
           />
 
-          {/* Middle Ring (radius 30% -> diameter 60%) */}
+          {/* Middle Ring: diameter 70% (radius 35%) */}
           <div
             className="orbit-faint-ring"
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
-              width: '60%',
-              height: '60%',
+              width: '70%',
+              height: '70%',
               transform: 'translate(-50%, -50%)',
               borderRadius: '50%',
-              border: '1px dashed rgba(45, 45, 55, 0.9)',
+              border: '1px dashed rgba(70, 70, 85, 0.85)',
               pointerEvents: 'none',
-              boxShadow: '0 0 24px rgba(200, 169, 122, 0.03)',
+              boxShadow: '0 0 24px rgba(245, 185, 66, 0.04)',
             }}
           />
 
-          {/* Outer Ring (radius 43% -> diameter 86%) */}
+          {/* Outer Ring: diameter 90% (radius 45%) */}
           <div
             className="orbit-faint-ring"
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
-              width: '86%',
-              height: '86%',
+              width: '90%',
+              height: '90%',
               transform: 'translate(-50%, -50%)',
               borderRadius: '50%',
-              border: '1px dashed rgba(45, 45, 55, 0.9)',
+              border: '1px dashed rgba(70, 70, 85, 0.85)',
               pointerEvents: 'none',
-              boxShadow: '0 0 30px rgba(200, 169, 122, 0.04)',
+              boxShadow: '0 0 30px rgba(245, 185, 66, 0.05)',
             }}
           />
 
-          {/* CENTER CORE: 70px glowing circle with "FK" */}
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ type: 'spring', damping: 16, stiffness: 120, delay: 0.1 }}
-            className="fk-core"
+          {/* ── CENTER CORE: 100% Mathematically Centered at (50%, 50%) ───── */}
+          <div
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: isMobile ? '60px' : '70px',
-              height: isMobile ? '60px' : '70px',
+              width: isMobile ? '68px' : '80px',
+              height: isMobile ? '68px' : '80px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #c8a97a 0%, #c98b7e 100%)',
-              color: '#0d0d11',
-              fontFamily: 'var(--font-space)',
-              fontWeight: 800,
-              fontSize: isMobile ? '19px' : '23px',
-              letterSpacing: '-1px',
+              background: 'linear-gradient(135deg, #1A1713 0%, #0E0D0B 100%)',
+              border: '1.5px solid #F5B942',
+              color: '#F0ECE3',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              zIndex: 10,
               userSelect: 'none',
               cursor: 'default',
+              zIndex: 10,
+              boxShadow:
+                '0 0 26px rgba(245, 185, 66, 0.45), inset 0 0 12px rgba(245, 185, 66, 0.22)',
             }}
           >
-            FK
-          </motion.div>
+            <span
+              style={{
+                fontFamily: 'var(--font-space)',
+                fontWeight: 800,
+                fontSize: isMobile ? '18px' : '22px',
+                lineHeight: 1,
+                background: 'linear-gradient(180deg, #FFF8E6 0%, #F5B942 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              {activeCategory ? ALL_SKILLS_DATA[activeCategory].length : totalSkillsCount}
+            </span>
+            <span
+              style={{
+                fontFamily: 'var(--font-space)',
+                fontWeight: 700,
+                fontSize: isMobile ? '8.5px' : '9.5px',
+                letterSpacing: '1.5px',
+                color: '#E5A97B',
+                textTransform: 'uppercase',
+                marginTop: '3px',
+              }}
+            >
+              SKILLS
+            </span>
+          </div>
 
-          {/* ROTATING RINGS WITH CHIPS */}
-          {/* 1. INNER RING: 4 chips, radius 17%, 26s per rotation, clockwise */}
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ type: 'spring', damping: 18, stiffness: 100, delay: 0.2 }}
+          {/* ── ROTATING RINGS WITH CHIPS (Perfect concentric alignment) ──────── */}
+          {/* 1. Inner Ring: 5 chips, radius 24%, 26s clockwise */}
+          <div
             className={`orbit-rotator-inner ${prefersReducedMotion ? 'no-spin' : ''}`}
             style={{
               position: 'absolute',
@@ -330,21 +343,17 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
               <ChipNode
                 key={chip.id}
                 chip={chip}
-                radiusRatio={0.17}
+                radiusRatio={0.24}
                 spinClass="orbit-counter-inner"
                 activeCategory={activeCategory}
                 isMobile={isMobile}
                 prefersReducedMotion={prefersReducedMotion}
               />
             ))}
-          </motion.div>
+          </div>
 
-          {/* 2. MIDDLE RING: 7 chips, radius 30%, 40s per rotation, counter-clockwise */}
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ type: 'spring', damping: 18, stiffness: 100, delay: 0.35 }}
+          {/* 2. Middle Ring: 8 chips, radius 35%, 40s counter-clockwise */}
+          <div
             className={`orbit-rotator-middle ${prefersReducedMotion ? 'no-spin' : ''}`}
             style={{
               position: 'absolute',
@@ -359,21 +368,17 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
               <ChipNode
                 key={chip.id}
                 chip={chip}
-                radiusRatio={0.3}
+                radiusRatio={0.35}
                 spinClass="orbit-counter-middle"
                 activeCategory={activeCategory}
                 isMobile={isMobile}
                 prefersReducedMotion={prefersReducedMotion}
               />
             ))}
-          </motion.div>
+          </div>
 
-          {/* 3. OUTER RING: 9 chips, radius 43%, 60s per rotation, clockwise */}
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ type: 'spring', damping: 18, stiffness: 100, delay: 0.5 }}
+          {/* 3. Outer Ring: 11 chips, radius 45%, 60s clockwise */}
+          <div
             className={`orbit-rotator-outer ${prefersReducedMotion ? 'no-spin' : ''}`}
             style={{
               position: 'absolute',
@@ -388,40 +393,72 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
               <ChipNode
                 key={chip.id}
                 chip={chip}
-                radiusRatio={0.43}
+                radiusRatio={0.45}
                 spinClass="orbit-counter-outer"
                 activeCategory={activeCategory}
                 isMobile={isMobile}
                 prefersReducedMotion={prefersReducedMotion}
               />
             ))}
-          </motion.div>
+          </div>
         </motion.div>
 
-        {/* CATEGORY FILTER PILLS & ALSO LINE */}
+        {/* ── FILTER PILLS & DETAILS (Clean balanced spacing) ────────────────── */}
         <div
           style={{
-            marginTop: isMobile ? '32px' : '44px',
+            marginTop: isMobile ? '36px' : '48px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '18px',
+            gap: '16px',
             width: '100%',
-            maxWidth: '820px',
-            zIndex: 6,
+            maxWidth: '960px',
+            zIndex: 8,
+            position: 'relative',
           }}
         >
-          {/* 5 Filter Pills */}
+          {/* Category Filter Pills Bar */}
           <div
             style={{
               display: 'flex',
               flexWrap: 'wrap',
               justifyContent: 'center',
-              gap: isMobile ? '8px' : '10px',
+              alignItems: 'center',
+              gap: isMobile ? '6px' : '8px',
+              padding: '0 8px',
+              width: '100%',
             }}
           >
+            {/* "All" Filter Button */}
+            <button
+              type="button"
+              onClick={() => setActiveCategory(null)}
+              style={{
+                fontFamily: 'var(--font-space)',
+                fontSize: isMobile ? '10.5px' : '11.5px',
+                fontWeight: 600,
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+                padding: isMobile ? '6px 12px' : '7px 16px',
+                borderRadius: '100px',
+                cursor: 'pointer',
+                transition: 'all 0.25s cubic-bezier(0.2, 0.9, 0.2, 1)',
+                background: activeCategory === null ? 'rgba(245, 185, 66, 0.18)' : '#0d0d11',
+                border: activeCategory === null
+                  ? '1px solid #F5B942'
+                  : '1px solid rgba(50, 50, 60, 0.8)',
+                color: activeCategory === null ? '#FFF8E6' : '#9a9592',
+                boxShadow: activeCategory === null
+                  ? '0 0 16px rgba(245, 185, 66, 0.35)'
+                  : 'none',
+              }}
+            >
+              All ({totalSkillsCount})
+            </button>
+
             {ALL_CATEGORIES.map(category => {
               const isSelected = activeCategory === category
+              const count = ALL_SKILLS_DATA[category].length
               return (
                 <button
                   key={category}
@@ -429,116 +466,108 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
                   onClick={() => handleCategoryClick(category)}
                   style={{
                     fontFamily: 'var(--font-space)',
-                    fontSize: isMobile ? '11px' : '12px',
+                    fontSize: isMobile ? '10.5px' : '11.5px',
                     fontWeight: 600,
-                    letterSpacing: '1px',
+                    letterSpacing: '0.8px',
                     textTransform: 'uppercase',
-                    padding: isMobile ? '6px 14px' : '7px 18px',
+                    padding: isMobile ? '6px 12px' : '7px 16px',
                     borderRadius: '100px',
                     cursor: 'pointer',
                     transition: 'all 0.25s cubic-bezier(0.2, 0.9, 0.2, 1)',
-                    background: isSelected ? 'rgba(200, 169, 122, 0.18)' : '#0d0d11',
+                    background: isSelected ? 'rgba(245, 185, 66, 0.18)' : '#0d0d11',
                     border: isSelected
-                      ? '1px solid #c8a97a'
-                      : '1px solid rgba(45, 45, 55, 0.8)',
-                    color: isSelected ? '#f1ede4' : '#9a9592',
+                      ? '1px solid #F5B942'
+                      : '1px solid rgba(50, 50, 60, 0.8)',
+                    color: isSelected ? '#FFF8E6' : '#9a9592',
                     boxShadow: isSelected
-                      ? '0 0 16px rgba(200, 169, 122, 0.35)'
+                      ? '0 0 16px rgba(245, 185, 66, 0.35)'
                       : 'none',
                   }}
                   onMouseEnter={e => {
                     if (!isSelected) {
-                      e.currentTarget.style.borderColor = 'rgba(200, 169, 122, 0.45)'
-                      e.currentTarget.style.color = '#d6d0c4'
+                      e.currentTarget.style.borderColor = 'rgba(245, 185, 66, 0.5)'
+                      e.currentTarget.style.color = '#E5A97B'
                     }
                   }}
                   onMouseLeave={e => {
                     if (!isSelected) {
-                      e.currentTarget.style.borderColor = 'rgba(45, 45, 55, 0.8)'
+                      e.currentTarget.style.borderColor = 'rgba(50, 50, 60, 0.8)'
                       e.currentTarget.style.color = '#9a9592'
                     }
                   }}
                 >
-                  {category}
+                  {category} ({count})
                 </button>
               )
             })}
           </div>
 
-          {/* "also: ..." line to showcase all tools not on the 20 orbit chips */}
+          {/* ── Detailed Skill Tags Showcase ───────────────────────────────── */}
           <div
             style={{
-              fontFamily: 'var(--font-space)',
-              fontSize: isMobile ? '12px' : '13px',
-              color: '#77716b',
-              textAlign: 'center',
-              lineHeight: 1.6,
-              maxWidth: '680px',
-              padding: '0 16px',
-              minHeight: '22px',
-              transition: 'opacity 0.3s ease',
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '6px',
+              maxWidth: '880px',
+              padding: '0 12px',
             }}
           >
-            <span style={{ color: '#c8a97a', fontWeight: 600 }}>
-              {activeCategory ? `Also in ${activeCategory}: ` : 'Also mastered: '}
+            <span
+              style={{
+                fontFamily: 'var(--font-space)',
+                fontSize: isMobile ? '10.5px' : '11.5px',
+                fontWeight: 700,
+                color: '#F5B942',
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+                marginRight: '4px',
+              }}
+            >
+              {activeCategory ? `${activeCategory} [${displayedCategorySkills.length}]:` : `Featured [${displayedCategorySkills.length} of ${totalSkillsCount}]:`}
             </span>
-            {displayedAdditionalTools.length > 0 ? (
-              <span>{displayedAdditionalTools.join(' · ')}</span>
-            ) : (
-              <span style={{ fontStyle: 'italic', color: '#9a9592' }}>
-                All core tools actively orbiting above
+            {displayedCategorySkills.map((skill, idx) => (
+              <span
+                key={idx}
+                style={{
+                  fontFamily: 'var(--font-space)',
+                  fontSize: isMobile ? '10.5px' : '11.5px',
+                  color: '#F0ECE3',
+                  background: 'rgba(20, 20, 26, 0.85)',
+                  border: '1px solid rgba(245, 185, 66, 0.22)',
+                  borderRadius: '6px',
+                  padding: '2.5px 9px',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.4)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {skill}
               </span>
-            )}
+            ))}
           </div>
         </div>
       </div>
 
       {/* Embedded CSS for 60fps orbits, upright counter-rotations, and pausing on hover */}
-      <style jsx global>{`
-        /* Stage dimension variable */
+      <style>{`
         .orbit-stage {
-          --s: 540px;
+          --s: 520px;
         }
         @media (max-width: 640px) {
           .orbit-stage {
-            --s: min(88vw, 440px);
+            --s: min(90vw, 420px);
           }
-        }
-
-        /* FK Core Pulsing Box-Shadow */
-        @keyframes fk-glow-pulse {
-          0%,
-          100% {
-            box-shadow: 0 0 22px rgba(200, 169, 122, 0.4),
-              0 0 45px rgba(201, 139, 126, 0.2);
-            transform: translate(-50%, -50%) scale(1);
-          }
-          50% {
-            box-shadow: 0 0 38px rgba(200, 169, 122, 0.7),
-              0 0 75px rgba(201, 139, 126, 0.42);
-            transform: translate(-50%, -50%) scale(1.04);
-          }
-        }
-        .fk-core {
-          animation: fk-glow-pulse 3s ease-in-out infinite;
         }
 
         /* 1. Inner Ring: 26s Clockwise */
         @keyframes orbit-spin-cw {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
         @keyframes orbit-spin-ccw {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(-360deg);
-          }
+          from { transform: rotate(0deg); }
+          to { transform: rotate(-360deg); }
         }
 
         .orbit-rotator-inner {
@@ -564,7 +593,7 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
           animation: orbit-spin-ccw 60s linear infinite;
         }
 
-        /* Hovering the stage pauses all orbits so people can read */
+        /* Hovering stage pauses orbits so users can inspect */
         .orbit-stage:hover .orbit-rotator-inner,
         .orbit-stage:hover .orbit-counter-inner,
         .orbit-stage:hover .orbit-rotator-middle,
@@ -574,7 +603,6 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
           animation-play-state: paused !important;
         }
 
-        /* Prefers-reduced-motion: stop rotations */
         .no-spin {
           animation: none !important;
         }
@@ -584,30 +612,13 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
           animation: none !important;
         }
 
-        /* Aurora Blobs animation loops (14s to 22s alternate) */
         @keyframes aurora-float-1 {
-          0% {
-            transform: translate(0, 0) scale(1);
-          }
-          100% {
-            transform: translate(50px, -35px) scale(1.15);
-          }
+          0% { transform: translate(0, 0) scale(1); }
+          100% { transform: translate(35px, -25px) scale(1.12); }
         }
         @keyframes aurora-float-2 {
-          0% {
-            transform: translate(0, 0) scale(1);
-          }
-          100% {
-            transform: translate(-45px, 40px) scale(1.12);
-          }
-        }
-        @keyframes aurora-float-3 {
-          0% {
-            transform: translate(0, 0) scale(1);
-          }
-          100% {
-            transform: translate(35px, 30px) scale(1.18);
-          }
+          0% { transform: translate(0, 0) scale(1); }
+          100% { transform: translate(-30px, 25px) scale(1.1); }
         }
 
         .aurora-blob-1 {
@@ -615,9 +626,6 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
         }
         .aurora-blob-2 {
           animation: aurora-float-2 22s ease-in-out infinite alternate;
-        }
-        .aurora-blob-3 {
-          animation: aurora-float-3 18s ease-in-out infinite alternate;
         }
       `}</style>
     </div>
@@ -646,7 +654,6 @@ function ChipNode({
   const isHighlighted = activeCategory !== null && activeCategory === chip.category
 
   return (
-    // Static placement along the circle radius at angle
     <div
       style={{
         position: 'absolute',
@@ -658,7 +665,6 @@ function ChipNode({
         pointerEvents: 'none',
       }}
     >
-      {/* Counter-rotate by -angle */}
       <div
         style={{
           transform: `rotate(${-chip.angle}deg)`,
@@ -666,7 +672,6 @@ function ChipNode({
           height: 0,
         }}
       >
-        {/* Innermost element spins in reverse at the exact same duration so text stays strictly upright */}
         <div
           className={`${spinClass} ${prefersReducedMotion ? 'no-spin' : ''}`}
           style={{
@@ -677,20 +682,20 @@ function ChipNode({
         >
           <div
             style={{
-              background: '#0d0d11',
+              background: '#0e0e12',
               border: isHighlighted
-                ? '1px solid #c8a97a'
-                : '1px solid #26262c',
+                ? '1px solid #F5B942'
+                : '1px solid #2a2a34',
               borderRadius: '8px',
-              padding: isMobile ? '4px 9px' : '5px 12px',
-              color: isHighlighted ? '#f1ede4' : '#d6d0c4',
+              padding: isMobile ? '4px 8px' : '5px 11px',
+              color: isHighlighted ? '#FFF8E6' : '#d6d0c4',
               fontFamily: 'var(--font-space)',
-              fontSize: isMobile ? '11px' : '12px',
-              fontWeight: 500,
+              fontSize: isMobile ? '10.5px' : '11.5px',
+              fontWeight: 600,
               whiteSpace: 'nowrap',
               boxShadow: isHighlighted
-                ? '0 0 16px rgba(200, 169, 122, 0.45)'
-                : '0 4px 12px rgba(0, 0, 0, 0.45)',
+                ? '0 0 16px rgba(245, 185, 66, 0.45)'
+                : '0 4px 12px rgba(0, 0, 0, 0.5)',
               opacity: isMatch ? 1 : 0.18,
               filter: isMatch ? 'none' : 'grayscale(0.8)',
               transform: isHighlighted ? 'scale(1.08)' : 'scale(1)',
@@ -701,23 +706,23 @@ function ChipNode({
             }}
             onMouseEnter={e => {
               if (isMatch) {
-                e.currentTarget.style.borderColor = '#c8a97a'
-                e.currentTarget.style.color = '#f1ede4'
-                e.currentTarget.style.boxShadow = '0 0 16px rgba(200, 169, 122, 0.5)'
+                e.currentTarget.style.borderColor = '#F5B942'
+                e.currentTarget.style.color = '#FFFFFF'
+                e.currentTarget.style.boxShadow = '0 0 16px rgba(245, 185, 66, 0.5)'
                 e.currentTarget.style.transform = 'scale(1.1)'
               }
             }}
             onMouseLeave={e => {
               if (isMatch) {
                 e.currentTarget.style.borderColor = isHighlighted
-                  ? '#c8a97a'
-                  : '#26262c'
+                  ? '#F5B942'
+                  : '#2a2a34'
                 e.currentTarget.style.color = isHighlighted
-                  ? '#f1ede4'
+                  ? '#FFF8E6'
                   : '#d6d0c4'
                 e.currentTarget.style.boxShadow = isHighlighted
-                  ? '0 0 16px rgba(200, 169, 122, 0.45)'
-                  : '0 4px 12px rgba(0, 0, 0, 0.45)'
+                  ? '0 0 16px rgba(245, 185, 66, 0.45)'
+                  : '0 4px 12px rgba(0, 0, 0, 0.5)'
                 e.currentTarget.style.transform = isHighlighted
                   ? 'scale(1.08)'
                   : 'scale(1)'

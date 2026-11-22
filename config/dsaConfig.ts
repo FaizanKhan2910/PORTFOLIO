@@ -31,11 +31,11 @@ export interface DsaConfig {
 
 export const DSA_CONFIG: DsaConfig = {
   name: "Faizan Khan",
-  totalSolved: 435,
-  totalSolvedDisplay: "435+",
+  totalSolved: 442,
+  totalSolvedDisplay: "442+",
   eyebrow: "DSA JOURNEY / 001",
   headline: "THE ART OF PROBLEM SOLVING.",
-  subheadline: "435+ problems solved. One problem at a time. Always getting better.",
+  subheadline: "442+ problems solved. One problem at a time. Always getting better.",
   quote: "Every problem is a new perspective. Breaking complex constraints into optimal time and space complexity.",
   platforms: [
     {

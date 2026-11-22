@@ -12,9 +12,9 @@ import DsaJourney from "@/components/dsa/DsaJourney"
 import DsaCta from "@/components/dsa/DsaCta"
 
 export const metadata: Metadata = {
-  title: "DSA & Problem-Solving Lab · Faizan Khan | 435+ Solved",
+  title: "DSA & Problem-Solving Lab · Faizan Khan | 442+ Solved",
   description:
-    "Interactive algorithm visualizations and problem-solving journey of Faizan Khan. 435+ verified DSA problems solved across LeetCode, GeeksforGeeks, and Codolio.",
+    "Interactive algorithm visualizations and problem-solving journey of Faizan Khan. 442+ verified DSA problems solved across LeetCode, GeeksforGeeks, and Codolio.",
   keywords: [
     "Faizan Khan DSA",
     "Data Structures and Algorithms",
@@ -39,7 +39,7 @@ export default function DsaPage() {
       <Cursor />
       <Navbar />
 
-      {/* 1. Immersive Hero & 435+ Counter */}
+      {/* 1. Immersive Hero & 442+ Counter */}
       <DsaHero />
 
       {/* 2. Platform Profiles (LeetCode, GFG, Codolio) */}

@@ -14,7 +14,7 @@ const CIRCUMFERENCE = 2 * Math.PI * R
 
 export default function DsaCard() {
   const isMobile = useIsMobile()
-  const [total, setTotal] = useState(435)
+  const [total, setTotal] = useState(442)
   const [displayCount, setDisplayCount] = useState(0)
   const [source, setSource] = useState<'manual' | 'codolio'>('manual')
   const [updatedAt, setUpdatedAt] = useState<string | null>(null)
