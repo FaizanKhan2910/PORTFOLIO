@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
 import ProjectCloud from './ProjectCloud'
+import { sound } from '../utils/sound'
 
 export const FIVE_PROJECTS = [
   {
@@ -536,6 +537,7 @@ function TimelineItem({ project, index, isMobile, isActive }) {
               href={project.live}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => sound.playButtonClick()}
               style={{
                 flex: 1,
                 padding: '9px 14px',
@@ -573,6 +575,7 @@ function TimelineItem({ project, index, isMobile, isActive }) {
             href={project.link}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => sound.playButtonClick()}
             style={{
               padding: '9px 14px',
               borderRadius: '6px',

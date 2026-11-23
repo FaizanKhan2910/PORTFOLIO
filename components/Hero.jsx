@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
 import CinematicParticles from './CinematicParticles'
+import { sound } from '../utils/sound'
 
 const ROLES = [
   'FULL-STACK DEVELOPER',
@@ -286,6 +287,7 @@ export default function Hero({ isLoaded = true }) {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => sound.playButtonClick()}
                   style={{
                     width: '42px',
                     height: '42px',
@@ -309,6 +311,7 @@ export default function Hero({ isLoaded = true }) {
               href="/resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => sound.playButtonClick()}
               style={{
                 width: '100%',
                 maxWidth: '280px',
@@ -365,6 +368,7 @@ export default function Hero({ isLoaded = true }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   title={s.label}
+                  onClick={() => sound.playButtonClick()}
                   style={{
                     width: '42px',
                     height: '42px',
@@ -518,6 +522,7 @@ export default function Hero({ isLoaded = true }) {
               href="/resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => sound.playButtonClick()}
               style={{
                 position: 'absolute',
                 bottom: '40px',

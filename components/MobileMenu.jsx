@@ -1,6 +1,7 @@
 'use client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { sound } from '../utils/sound'
 
 const SOCIALS = [
   { label: 'GitHub', href: 'https://github.com/FaizanKhan2910' },
@@ -17,6 +18,7 @@ export default function MobileMenu({ isOpen, onClose }) {
   }, [isOpen])
 
   const scrollTo = (id) => {
+    sound.playButtonClick()
     onClose()
     // If not on home page, navigate there first then scroll
     if (window.location.pathname !== '/') {

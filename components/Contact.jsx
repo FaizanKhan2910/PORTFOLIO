@@ -1,6 +1,7 @@
 'use client'
 
 import { useIsMobile } from '../hooks/useIsMobile'
+import { sound } from '../utils/sound'
 
 export default function Contact() {
   const isMobile = useIsMobile()
@@ -44,6 +45,7 @@ export default function Contact() {
                 { label: 'GitHub', value: 'FaizanKhan2910', href: 'https://github.com/FaizanKhan2910' },
               ].map(link => (
                 <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer"
+                  onClick={() => sound.playButtonClick()}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '16px',
                     textDecoration: 'none', padding: '16px 0',
@@ -71,6 +73,7 @@ export default function Contact() {
             <a
               href="mailto:fk6307672466@email.com"
               className="magnetic"
+              onClick={() => sound.playButtonClick()}
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '16px',
                 padding: '20px 40px',
@@ -103,6 +106,7 @@ export default function Contact() {
               href="/resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => sound.playButtonClick()}
               style={{
                 fontFamily: 'var(--font-space)',
                 fontSize: '12px', letterSpacing: '2px',

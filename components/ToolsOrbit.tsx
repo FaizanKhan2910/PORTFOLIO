@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { sound } from '../utils/sound'
 
 export type ToolCategory =
   | 'Languages'
@@ -79,6 +80,7 @@ interface ToolsOrbitProps {
 
 export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
   const [activeCategory, setActiveCategory] = useState<ToolCategory | null>(null)
+  const [hiddenChipIds, setHiddenChipIds] = useState<Set<string>>(new Set())
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const stageRef = useRef<HTMLDivElement | null>(null)
 
@@ -86,6 +88,20 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
   const totalSkillsCount = useMemo(() => {
     return Object.values(ALL_SKILLS_DATA).reduce((acc, list) => acc + list.length, 0)
   }, [])
+
+  const handleChipDismiss = (chipId: string) => {
+    sound.playSkillPop()
+    setHiddenChipIds(prev => {
+      const next = new Set(prev)
+      next.add(chipId)
+      return next
+    })
+  }
+
+  const handleResetSkills = () => {
+    sound.playSkillReplay()
+    setHiddenChipIds(new Set())
+  }
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -120,7 +136,8 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
     mouseY.set(0)
   }
 
-  const handleCategoryClick = (category: ToolCategory) => {
+  const handleCategoryClick = (category: ToolCategory | null) => {
+    sound.playButtonClick(1.15)
     setActiveCategory(prev => (prev === category ? null : category))
   }
 
@@ -276,6 +293,8 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
 
           {/* ── CENTER CORE: 100% Mathematically Centered at (50%, 50%) ───── */}
           <div
+            onClick={hiddenChipIds.size > 0 ? handleResetSkills : undefined}
+            title={hiddenChipIds.size > 0 ? 'Click to restore all skills' : undefined}
             style={{
               position: 'absolute',
               top: '50%',
@@ -292,10 +311,12 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
               alignItems: 'center',
               justifyContent: 'center',
               userSelect: 'none',
-              cursor: 'default',
+              cursor: hiddenChipIds.size > 0 ? 'pointer' : 'default',
               zIndex: 10,
-              boxShadow:
-                '0 0 26px rgba(245, 185, 66, 0.45), inset 0 0 12px rgba(245, 185, 66, 0.22)',
+              boxShadow: hiddenChipIds.size > 0
+                ? '0 0 32px rgba(245, 185, 66, 0.6), inset 0 0 16px rgba(245, 185, 66, 0.3)'
+                : '0 0 26px rgba(245, 185, 66, 0.45), inset 0 0 12px rgba(245, 185, 66, 0.22)',
+              transition: 'all 0.3s ease',
             }}
           >
             <span
@@ -309,7 +330,7 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              {activeCategory ? ALL_SKILLS_DATA[activeCategory].length : totalSkillsCount}
+              {Math.max(0, (activeCategory ? ALL_SKILLS_DATA[activeCategory].length : totalSkillsCount) - hiddenChipIds.size)}
             </span>
             <span
               style={{
@@ -348,6 +369,8 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
                 activeCategory={activeCategory}
                 isMobile={isMobile}
                 prefersReducedMotion={prefersReducedMotion}
+                isDismissed={hiddenChipIds.has(chip.id)}
+                onDismiss={() => handleChipDismiss(chip.id)}
               />
             ))}
           </div>
@@ -373,6 +396,8 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
                 activeCategory={activeCategory}
                 isMobile={isMobile}
                 prefersReducedMotion={prefersReducedMotion}
+                isDismissed={hiddenChipIds.has(chip.id)}
+                onDismiss={() => handleChipDismiss(chip.id)}
               />
             ))}
           </div>
@@ -398,6 +423,8 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
                 activeCategory={activeCategory}
                 isMobile={isMobile}
                 prefersReducedMotion={prefersReducedMotion}
+                isDismissed={hiddenChipIds.has(chip.id)}
+                onDismiss={() => handleChipDismiss(chip.id)}
               />
             ))}
           </div>
@@ -417,6 +444,69 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
             position: 'relative',
           }}
         >
+          {/* ── REPLAY / RESTORE SKILLS BUTTON ─────────────────────────── */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              type="button"
+              onClick={handleResetSkills}
+              style={{
+                fontFamily: 'var(--font-space)',
+                fontSize: isMobile ? '10.5px' : '11.5px',
+                fontWeight: 700,
+                letterSpacing: '1.2px',
+                textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: isMobile ? '7px 18px' : '9px 24px',
+                borderRadius: '100px',
+                cursor: 'pointer',
+                background: hiddenChipIds.size > 0
+                  ? 'linear-gradient(135deg, rgba(245, 185, 66, 0.25) 0%, rgba(201, 169, 110, 0.12) 100%)'
+                  : 'rgba(18, 18, 24, 0.8)',
+                border: hiddenChipIds.size > 0
+                  ? '1.5px solid #F5B942'
+                  : '1px solid rgba(245, 185, 66, 0.35)',
+                color: hiddenChipIds.size > 0 ? '#FFF8E6' : '#C9A96E',
+                boxShadow: hiddenChipIds.size > 0
+                  ? '0 0 22px rgba(245, 185, 66, 0.45), inset 0 0 10px rgba(245, 185, 66, 0.2)'
+                  : '0 2px 10px rgba(0, 0, 0, 0.4)',
+                transition: 'all 0.3s cubic-bezier(0.2, 0.9, 0.2, 1)',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = '#F5B942'
+                e.currentTarget.style.color = '#FFF8E6'
+                e.currentTarget.style.boxShadow = '0 0 26px rgba(245, 185, 66, 0.55)'
+                e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = hiddenChipIds.size > 0 ? '#F5B942' : 'rgba(245, 185, 66, 0.35)'
+                e.currentTarget.style.color = hiddenChipIds.size > 0 ? '#FFF8E6' : '#C9A96E'
+                e.currentTarget.style.boxShadow = hiddenChipIds.size > 0
+                  ? '0 0 22px rgba(245, 185, 66, 0.45), inset 0 0 10px rgba(245, 185, 66, 0.2)'
+                  : '0 2px 10px rgba(0, 0, 0, 0.4)'
+                e.currentTarget.style.transform = 'translateY(0) scale(1)'
+              }}
+            >
+              <span style={{ fontSize: '13px', display: 'inline-block' }}>↺</span>
+              <span>REPLAY SKILLS</span>
+              {hiddenChipIds.size > 0 && (
+                <span
+                  style={{
+                    background: '#F5B942',
+                    color: '#0e0e12',
+                    borderRadius: '10px',
+                    padding: '1px 7px',
+                    fontSize: '10px',
+                    fontWeight: 800,
+                  }}
+                >
+                  +{hiddenChipIds.size}
+                </span>
+              )}
+            </button>
+          </div>
+
           {/* Category Filter Pills Bar */}
           <div
             style={{
@@ -432,7 +522,7 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
             {/* "All" Filter Button */}
             <button
               type="button"
-              onClick={() => setActiveCategory(null)}
+              onClick={() => handleCategoryClick(null)}
               style={{
                 fontFamily: 'var(--font-space)',
                 fontSize: isMobile ? '10.5px' : '11.5px',
@@ -527,24 +617,47 @@ export default function ToolsOrbit({ isMobile = false }: ToolsOrbitProps) {
             >
               {activeCategory ? `${activeCategory} [${displayedCategorySkills.length}]:` : `Featured [${displayedCategorySkills.length} of ${totalSkillsCount}]:`}
             </span>
-            {displayedCategorySkills.map((skill, idx) => (
-              <span
-                key={idx}
-                style={{
-                  fontFamily: 'var(--font-space)',
-                  fontSize: isMobile ? '10.5px' : '11.5px',
-                  color: '#F0ECE3',
-                  background: 'rgba(20, 20, 26, 0.85)',
-                  border: '1px solid rgba(245, 185, 66, 0.22)',
-                  borderRadius: '6px',
-                  padding: '2.5px 9px',
-                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.4)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {skill}
-              </span>
-            ))}
+            {displayedCategorySkills.map((skill, idx) => {
+              const isDismissed = hiddenChipIds.has(skill)
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => !isDismissed && handleChipDismiss(skill)}
+                  title={!isDismissed ? `Click to dissolve ${skill}` : undefined}
+                  style={{
+                    fontFamily: 'var(--font-space)',
+                    fontSize: isMobile ? '10.5px' : '11.5px',
+                    color: isDismissed ? 'rgba(100, 100, 110, 0.3)' : '#F0ECE3',
+                    background: isDismissed ? 'transparent' : 'rgba(20, 20, 26, 0.85)',
+                    border: isDismissed ? '1px dashed rgba(245, 185, 66, 0.15)' : '1px solid rgba(245, 185, 66, 0.22)',
+                    borderRadius: '6px',
+                    padding: '2.5px 9px',
+                    boxShadow: isDismissed ? 'none' : '0 2px 6px rgba(0, 0, 0, 0.4)',
+                    whiteSpace: 'nowrap',
+                    cursor: isDismissed ? 'default' : 'pointer',
+                    opacity: isDismissed ? 0.25 : 1,
+                    transform: isDismissed ? 'scale(0.88)' : 'scale(1)',
+                    transition: 'all 0.3s cubic-bezier(0.2, 0.9, 0.2, 1)',
+                    userSelect: 'none',
+                  }}
+                  onMouseEnter={e => {
+                    if (!isDismissed) {
+                      e.currentTarget.style.borderColor = '#F5B942'
+                      e.currentTarget.style.color = '#F5B942'
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!isDismissed) {
+                      e.currentTarget.style.borderColor = 'rgba(245, 185, 66, 0.22)'
+                      e.currentTarget.style.color = '#F0ECE3'
+                    }
+                  }}
+                >
+                  {skill}
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -640,6 +753,8 @@ interface ChipNodeProps {
   activeCategory: ToolCategory | null
   isMobile: boolean
   prefersReducedMotion: boolean
+  isDismissed: boolean
+  onDismiss: () => void
 }
 
 function ChipNode({
@@ -649,6 +764,8 @@ function ChipNode({
   activeCategory,
   isMobile,
   prefersReducedMotion,
+  isDismissed,
+  onDismiss,
 }: ChipNodeProps) {
   const isMatch = activeCategory === null || activeCategory === chip.category
   const isHighlighted = activeCategory !== null && activeCategory === chip.category
@@ -677,10 +794,12 @@ function ChipNode({
           style={{
             position: 'absolute',
             transform: 'translate(-50%, -50%)',
-            pointerEvents: 'auto',
+            pointerEvents: isDismissed ? 'none' : 'auto',
           }}
         >
           <div
+            onClick={!isDismissed ? onDismiss : undefined}
+            title={!isDismissed ? `Click to dissolve ${chip.name}` : undefined}
             style={{
               background: '#0e0e12',
               border: isHighlighted
@@ -696,24 +815,26 @@ function ChipNode({
               boxShadow: isHighlighted
                 ? '0 0 16px rgba(245, 185, 66, 0.45)'
                 : '0 4px 12px rgba(0, 0, 0, 0.5)',
-              opacity: isMatch ? 1 : 0.18,
-              filter: isMatch ? 'none' : 'grayscale(0.8)',
-              transform: isHighlighted ? 'scale(1.08)' : 'scale(1)',
+              opacity: isDismissed ? 0 : (isMatch ? 1 : 0.18),
+              filter: isDismissed ? 'blur(6px) brightness(1.5)' : (isMatch ? 'none' : 'grayscale(0.8)'),
+              transform: isDismissed
+                ? 'scale(1.4) translateY(-10px)'
+                : (isHighlighted ? 'scale(1.08)' : 'scale(1)'),
               transition:
-                'transform 0.25s cubic-bezier(0.2, 0.9, 0.2, 1), border-color 0.25s, box-shadow 0.25s, color 0.25s, opacity 0.35s, filter 0.35s',
-              cursor: 'default',
+                'transform 0.35s cubic-bezier(0.2, 0.9, 0.2, 1), border-color 0.25s, box-shadow 0.25s, color 0.25s, opacity 0.35s, filter 0.35s',
+              cursor: isDismissed ? 'default' : 'pointer',
               userSelect: 'none',
             }}
             onMouseEnter={e => {
-              if (isMatch) {
+              if (isMatch && !isDismissed) {
                 e.currentTarget.style.borderColor = '#F5B942'
                 e.currentTarget.style.color = '#FFFFFF'
-                e.currentTarget.style.boxShadow = '0 0 16px rgba(245, 185, 66, 0.5)'
-                e.currentTarget.style.transform = 'scale(1.1)'
+                e.currentTarget.style.boxShadow = '0 0 18px rgba(245, 185, 66, 0.6)'
+                e.currentTarget.style.transform = 'scale(1.14)'
               }
             }}
             onMouseLeave={e => {
-              if (isMatch) {
+              if (isMatch && !isDismissed) {
                 e.currentTarget.style.borderColor = isHighlighted
                   ? '#F5B942'
                   : '#2a2a34'

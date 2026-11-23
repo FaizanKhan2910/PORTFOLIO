@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
 import MobileMenu from './MobileMenu'
+import { sound } from '../utils/sound'
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -20,6 +21,7 @@ export default function Navbar() {
   }, [])
 
   const handleNavClick = (id) => {
+    sound.playButtonClick()
     if (pathname !== '/') {
       router.push(`/#${id}`)
     } else {

@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import { sound } from '../utils/sound'
 
 export default function Loader({ onComplete }) {
   const [count, setCount] = useState(0)
@@ -33,6 +34,7 @@ export default function Loader({ onComplete }) {
 
   return (
     <div
+      onClick={() => sound.unlock()}
       style={{
         position: 'fixed', inset: 0, background: '#0C0C0E',
         zIndex: 9990, display: 'flex', flexDirection: 'column',
